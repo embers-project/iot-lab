@@ -4,7 +4,7 @@ This repository is an IoT-LAB SDK for the H2020 [EMBERS](http://www.embers-proje
 
 ### Requirement
 
-* Create an [IoT-LAB](https://www.iot-lab.info/testbed/signup.php) testbed account
+* Ask an [IoT-LAB](https://www.iot-lab.info/testbed/signup.php) testbed account
 
 ### Launch testbed experiment
 

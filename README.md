@@ -78,13 +78,13 @@ gateway_uuid=
 Finally you can launch device broker test :
 
 ```
-<login>@<site>:~/iot-lab$ ./serial_devices.py -h
+<login>@<site>:~/iot-lab$ ./serial_nodes.py -h
 # read sensors with a period of 10 seconds
-<login>@<site>:~/iot-lab$ ./serial_devices.py --sensors-period 10
+<login>@<site>:~/iot-lab$ ./serial_nodes.py --sensors-period 10
 # parking event with a period of 30 seconds (eg. average of 1 event every 30 seconds or 120 events per hour) 
-<login>@<site>:~/iot-lab$ ./serial_devices.py --sensors-parking 30
+<login>@<site>:~/iot-lab$ ./serial_nodes.py --sensors-parking 30
 # read sensors and parking event at the same time
-<login>@<site>:~/iot-lab$ ./serial_devices.py --sensors-period 10 --sensors-parking 30
+<login>@<site>:~/iot-lab$ ./serial_nodes.py --sensors-period 10 --sensors-parking 30
 ``` 
 
 It's an interactive script execution and you can launch commands or stop manually the execution with Ctrl+C shortcut.

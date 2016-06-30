@@ -48,9 +48,17 @@ You must clone this repository on the frontend SSH
  ``` 
 We provide you a binary firmware file (eg. firmwares/embers_sensors.elf) in charge of reading sensors values (eg. light, temperature, pressure) and emulate parking event. In this test you must use <b>M3 nodes</b> and you can view sensors hardware specification [here](https://www.iot-lab.info/hardware/m3/). The parking event emulation is based on a [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution).
 
-You can find the firmware source code here. It's based on IoT-LAB [OpenLAB](https://github.com/iot-lab/openlab) drivers and [FreeRTOS](http://www.freertos.org/) embedded operating system.
+You can view the firmware source code and how to modify and compile it [here](https://www.iot-lab.info/tutorials/get-compile-a-m3-firmware-code/). It's based on IoT-LAB [OpenLAB](https://github.com/iot-lab/openlab) drivers and [FreeRTOS](http://www.freertos.org/) embedded operating system. 
 
 This firmware is configurable (eg. start measure with a period) by serial communication. Indeed on the frontend SSH when the experiment is running you can access all experiment nodes serial port (tcp socket on port 20000) and send commands to the firmware. Moreover the sensors and parking event data is written on the serial port. We use an IoT-LAB library, [serial_aggregator](https://www.iot-lab.info/tutorials/nodes-serial-link-aggregation/), to aggregate all the experiment nodes serial links (python script based on the cli-tools and asyncore events)
+
+Verify that your experiment is running :
+
+```  
+<login>@<site>:~/iot-lab$ experiment-cli wait
+Waiting that experiment <exp_id> gets in state Running
+"Running"
+``` 
 
 If you don't launch an experiment with firmware you can simply flash the firmware on all experiments nodes :
 

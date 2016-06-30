@@ -2,7 +2,6 @@
 
 This repository is an IoT-LAB SDK for the H2020 [EMBERS](http://www.embers-project.eu/) project. It provides a set of tools for developers to run efficiently experimentation tests. 
 
-
 ### Requirement
 
 * Create an [IoT-LAB](https://www.iot-lab.info/testbed/signup.php) testbed account
@@ -47,16 +46,48 @@ You must clone this repository on the frontend SSH
  <login>@<site>:~$ git clone https://github.com/embers-project/iot-lab.git
  <login>@<site>:~$ cd iot-lab
  ``` 
-We provide you a binary firmware file (eg. firmwares/embers_sensors.elf) in charge of reading sensors values (eg. light, temperature, pressure) and emulate parking event. In this example we use M3 nodes and you can view sensors hardware specification [here](https://www.iot-lab.info/hardware/m3/). The parking event emulation is based on a [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution). 
+We provide you a binary firmware file (eg. firmwares/embers_sensors.elf) in charge of reading sensors values (eg. light, temperature, pressure) and emulate parking event. In this example we use M3 nodes and you can view sensors hardware specification [here](https://www.iot-lab.info/hardware/m3/). The parking event emulation is based on a [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution).
+
+You can find the firmware source code here. It's based on IoT-LAB [OpenLAB](https://github.com/iot-lab/openlab) drivers and [FreeRTOS](http://www.freertos.org/) embedded operating system.
 
 This firmware is configurable (eg. start measure with a period) by serial communication. Indeed on the frontend SSH when the experiment is running you can access all experiment nodes serial port (tcp socket on port 20000) and send commands to the firmware. Moreover the sensors and parking event data is written on the serial port. We use an IoT-LAB library, [serial_aggregator](https://www.iot-lab.info/tutorials/nodes-serial-link-aggregation/), to aggregate all the experiment nodes serial links (python script based on the cli-tools and asyncore events)
 
-Currently you can only test a [Meshblu](https://meshblu.readme.io/) device broker implementation. You must fill the broker file configuration and the meshblu section.
+If you don't launch an experiment with firmware you can simply flash the firmware on all experiments nodes :
 
-```  
- <login>@<site>:~$ git clone https://github.com/embers-project/iot-lab.git
- <login>@<site>:~$ cd iot-lab
+ ```  
+ <login>@<site>:~/iot-lab$ node-cli --update firmwares/embers_sensors.elf
  ``` 
+
+Currently you can only test a [Meshblu](https://meshblu.readme.io/) device broker implementation. You must fill the broker file configuration and the meshblu section (url and gateway uuid parameters).
+
+```
+<login>@<site>:~/iot-lab$ cat broker.cfg
+[meshblu]
+url= 
+gateway_uuid=
+``` 
+
+Finally you can launch device broker test :
+
+```
+<login>@<site>:~/iot-lab$ ./serial_devices.py -h
+# read sensors with a period of 10 seconds
+<login>@<site>:~/iot-lab$ ./serial_devices.py --sensors-period 10
+# parking event with a period of 30 seconds (eg. average of 1 event every 30 seconds or 120 events per hour) 
+<login>@<site>:~/iot-lab$ ./serial_devices.py --sensors-parking 30
+# read sensors and parking event at the same time
+<login>@<site>:~/iot-lab$ ./serial_devices.py --sensors-period 10 --sensors-parking 30
+``` 
+
+It's an interactive script execution and you can launch commands or stop manually the execution with Ctrl+C shortcut.
+At the end of the experiment the script will ended automatically due to serial_aggregator library detection.
+
+If you want a non interactive execution you can use this command.
+
+Congratulations, you launch your first test !!!!
+
+
+
 
 
 

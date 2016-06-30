@@ -6,7 +6,7 @@ This repository is an IoT-LAB SDK for the H2020 [EMBERS](http://www.embers-proje
 
 * Create an [IoT-LAB](https://www.iot-lab.info/testbed/signup.php) testbed account
 
-### Launch an experiment
+### Launch testbed experiment
 
 The first step is to launch an experiment on the IoT-LAB testbed. For this purpose you must choose :
   * an [IoT-LAB site](https://www.iot-lab.info/deployment/)
@@ -46,7 +46,7 @@ You must clone this repository on the frontend SSH
  <login>@<site>:~$ git clone https://github.com/embers-project/iot-lab.git
  <login>@<site>:~$ cd iot-lab
  ``` 
-We provide you a binary firmware file (eg. firmwares/embers_sensors.elf) in charge of reading sensors values (eg. light, temperature, pressure) and emulate parking event. In this example we use M3 nodes and you can view sensors hardware specification [here](https://www.iot-lab.info/hardware/m3/). The parking event emulation is based on a [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution).
+We provide you a binary firmware file (eg. firmwares/embers_sensors.elf) in charge of reading sensors values (eg. light, temperature, pressure) and emulate parking event. In this test you must use <b>M3 nodes</b> and you can view sensors hardware specification [here](https://www.iot-lab.info/hardware/m3/). The parking event emulation is based on a [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution).
 
 You can find the firmware source code here. It's based on IoT-LAB [OpenLAB](https://github.com/iot-lab/openlab) drivers and [FreeRTOS](http://www.freertos.org/) embedded operating system.
 

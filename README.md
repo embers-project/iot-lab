@@ -16,12 +16,12 @@ The first step is to launch an experiment on the IoT-LAB testbed. For this purpo
 
 You can easily do this action with IoT-LAB [command-line tools](https://www.iot-lab.info/tutorials/experiment-cli-client/) (cli-tools) installed on each IoT-LAB site frontend SSH.
 
-Go to the frontend SSH
+Go to the frontend SSH site
   ```  
   my_computer$ ssh <login>@<site>.iot-lab.info
   <login>@<site>:~$ 
   ```
-Configure IoT-LAB authentication and verify your credentials (print IoT-LAB nodes list)
+Configure IoT-LAB authentication and verify your credentials (print IoT-LAB site nodes list)
   ```  
   <login>@<site>:~$ auth-cli -u <login>
   <login>@<site>:~$ experiment-cli info -l --site <site>
@@ -50,7 +50,7 @@ We provide you a binary firmware file (eg. firmwares/embers_sensors.elf) in char
 
 You can view the firmware [source code](https://github.com/iot-lab/openlab/tree/master/appli/iotlab_examples/embers_sensors) and how to modify and compile it [here](https://www.iot-lab.info/tutorials/get-compile-a-m3-firmware-code/). It's based on IoT-LAB [OpenLAB](https://github.com/iot-lab/openlab) drivers and [FreeRTOS](http://www.freertos.org/) embedded operating system. 
 
-This firmware is configurable (eg. start measure with a period) by serial communication. Indeed on the frontend SSH when the experiment is running you can access all experiment nodes serial port (tcp socket on port 20000) and send commands to the firmware. Moreover the sensors and parking event data is written on the serial port. We use an IoT-LAB library, [serial_aggregator](https://www.iot-lab.info/tutorials/nodes-serial-link-aggregation/), to aggregate all the experiment nodes serial links (python script based on the cli-tools and asyncore events)
+This firmware is configurable (eg. start measure with a period) by serial communication. Indeed on the frontend SSH when the experiment is running you can access all experiment nodes serial port (tcp socket on port 20000) and send commands to the firmware. Moreover the sensors and parking event data is written on the serial port. We use an IoT-LAB library, [serial_aggregator](https://www.iot-lab.info/tutorials/nodes-serial-link-aggregation/), to aggregate all the experiment nodes serial links (python script based on the cli-tools and asyncore events). When we received measures data from serial links nodes we just send it to the broker device.
 
 Verify that your experiment is running :
 
@@ -75,7 +75,7 @@ url=
 gateway_uuid=
 ``` 
 
-Finally you can launch device broker test :
+Finally you can launch Meshblu device broker test as follows :
 
 ```
 <login>@<site>:~/iot-lab$ ./serial_nodes.py -h
@@ -88,8 +88,8 @@ Finally you can launch device broker test :
 ``` 
 
 It's an interactive script execution and you can launch commands or stop manually the execution with Ctrl+C shortcut.
-At the end of the experiment the script will ended automatically due to serial_aggregator library detection.
 
+At the end of the experiment the script will ended automatically due to serial_aggregator library detection.
 If you want a non interactive execution you can use this command :
 
 ```

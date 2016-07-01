@@ -94,7 +94,7 @@ If you want a non interactive execution you can use this command :
 
 ```
 # killed automatically at the end of experiment
-nohup ./serial_devices.py --sensors-period 10 > embers_sensors.log 2>&1 &
+<login>@<site>:~/iot-lab$ nohup ./serial_devices.py --sensors-period 10 > embers_sensors.log 2>&1 &
 ``` 
 
 Congratulations, you launch your first test !!!!

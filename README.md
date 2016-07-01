@@ -66,7 +66,7 @@ If you don't launch an experiment with firmware you can simply flash the firmwar
  <login>@<site>:~/iot-lab$ node-cli --update firmwares/embers_sensors.elf
  ``` 
 
-Currently you can only test a [Meshblu](https://meshblu.readme.io/) device broker implementation. You must fill the broker file configuration and the meshblu section (url and gateway uuid parameters).
+Currently you can only test a [Meshblu](https://meshblu.readme.io/) device broker implementation with HTTP protocol. You must fill the broker file configuration and meshblu section (url and gateway uuid parameters).
 
 ```
 <login>@<site>:~/iot-lab$ cat broker.cfg

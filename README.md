@@ -90,7 +90,12 @@ Finally you can launch device broker test :
 It's an interactive script execution and you can launch commands or stop manually the execution with Ctrl+C shortcut.
 At the end of the experiment the script will ended automatically due to serial_aggregator library detection.
 
-If you want a non interactive execution you can use this command.
+If you want a non interactive execution you can use this command :
+
+```
+# killed automatically at the end of experiment
+nohup ./serial_devices.py --sensors-period 10 > embers_sensors.log 2>&1 &
+``` 
 
 Congratulations, you launch your first test !!!!
 

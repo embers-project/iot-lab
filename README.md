@@ -87,9 +87,9 @@ Finally you can launch Meshblu device broker test as follows :
 <login>@<site>:~/iot-lab$ ./serial_nodes.py --sensors-period 10 --sensors-parking 30
 ``` 
 
-It's an interactive script execution and you can launch commands or stop manually the execution with Ctrl+C shortcut.
+It's an interactive script execution and you can stop manually the execution with Ctrl+C shortcut.
+At the end of the experiment the script will also ended automatically due to serial_aggregator library detection.
 
-At the end of the experiment the script will ended automatically due to serial_aggregator library detection.
 If you want a non interactive execution you can use this command :
 
 ```

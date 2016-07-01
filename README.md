@@ -1,14 +1,14 @@
 # IoT-LAB EMBERS project 
 
-This repository is an IoT-LAB SDK for the H2020 [EMBERS](http://www.embers-project.eu/) project. It provides a set of tools for developers to run efficiently experimentation tests. 
+This repository contains an SDK for the H2020 [EMBERS](http://www.embers-project.eu/) project. It provides a set of tools for developers to run efficiently experimentation tests from the IoT-Lab. 
 
 ### Requirement
 
-* Ask an [IoT-LAB](https://www.iot-lab.info/testbed/signup.php) testbed account
+* Ask for an [IoT-LAB](https://www.iot-lab.info/testbed/signup.php) testbed account
 
 ### Launch testbed experiment
 
-The first step is to launch an experiment on the IoT-LAB testbed. For this purpose you must choose :
+The first step is to launch an experiment on the IoT-LAB testbed. For this purpose you must choose:
   * an [IoT-LAB site](https://www.iot-lab.info/deployment/)
   * the experiment duration
   * which nodes you will book
@@ -46,11 +46,11 @@ You must clone this repository on the frontend SSH
  <login>@<site>:~$ git clone https://github.com/embers-project/iot-lab.git
  <login>@<site>:~$ cd iot-lab
  ``` 
-We provide you a binary firmware file (eg. firmwares/embers_sensors.elf) in charge of reading sensors values (eg. light, temperature, pressure) and emulate parking event. In this test you must use <b>M3 nodes</b> and you can view sensors hardware specification [here](https://www.iot-lab.info/hardware/m3/). The parking event emulation is based on a [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution).
+We provide you with a binary firmware file (e.g. `firmwares/embers_sensors.elf`) in charge of reading sensor values (e.g. light, temperature, pressure) and simulate parking events. In this test you must use <b>M3 nodes</b> (you can view sensors hardware specification [here](https://www.iot-lab.info/hardware/m3/)), and the parking event simulation is based on a [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution).
 
 You can view the firmware [source code](https://github.com/iot-lab/openlab/tree/master/appli/iotlab_examples/embers_sensors) and how to modify and compile it [here](https://www.iot-lab.info/tutorials/get-compile-a-m3-firmware-code/). It's based on IoT-LAB [OpenLAB](https://github.com/iot-lab/openlab) drivers and [FreeRTOS](http://www.freertos.org/) embedded operating system. 
 
-This firmware is configurable (eg. start measure with a period) by serial communication. Indeed on the frontend SSH when the experiment is running you can access all experiment nodes serial port (tcp socket on port 20000) and send commands to the firmware. Moreover the sensors and parking event data is written on the serial port. We use an IoT-LAB library, [serial_aggregator](https://www.iot-lab.info/tutorials/nodes-serial-link-aggregation/), to aggregate all the experiment nodes serial links (python script based on the cli-tools and asyncore events). When we received measures data from serial links nodes we just send it to the broker device.
+This firmware is configurable (e.g. start measurement with a period) by serial communication. Indeed, on the frontend SSH when the experiment is running you can access all experiment nodes serial port (TCP socket on port 20000) and send commands to the firmware. Moreover the sensors and parking event data is written on the serial port. We use an IoT-LAB library, [serial_aggregator](https://www.iot-lab.info/tutorials/nodes-serial-link-aggregation/), to aggregate all the experiment nodes serial links (python script based on the cli-tools and asyncore events). When we received measures data from serial links nodes we just send it to the broker device.
 
 Verify that your experiment is running :
 
@@ -66,7 +66,7 @@ If you don't launch an experiment with firmware you can simply flash the firmwar
  <login>@<site>:~/iot-lab$ node-cli --update firmwares/embers_sensors.elf
  ``` 
 
-Currently you can only test a [Meshblu](https://meshblu.readme.io/) device broker implementation with HTTP protocol. You must fill the broker file configuration and meshblu section (url and gateway uuid parameters).
+Currently you can only test a [Meshblu](https://meshblu.readme.io/) device broker implementation with HTTP protocol. You must fill the broker file configuration and Meshblu section (URL and Gateway UUID parameters).
 
 ```
 <login>@<site>:~/iot-lab$ cat broker.cfg
@@ -88,7 +88,7 @@ Finally you can launch Meshblu device broker test as follows :
 ``` 
 
 It's an interactive script execution and you can stop manually the execution with Ctrl+C shortcut.
-At the end of the experiment the script will also ended automatically due to serial_aggregator library detection.
+At the end of the experiment the script will also have ended automatically due to `serial_aggregator` library detection.
 
 If you want a non interactive execution you can use this command :
 
@@ -97,13 +97,8 @@ If you want a non interactive execution you can use this command :
 <login>@<site>:~/iot-lab$ nohup ./serial_devices.py --sensors-period 10 > embers_sensors.log 2>&1 &
 ``` 
 
-Congratulations, you launch your first test !!!!
+Congratulations, you've succesfully launched your first test!
 
-
-
-
-
-
-
+If you happen to face any problem with these tools, feel free to create an issue [here](https://github.com/embers-project/iot-lab/issues) or in our [Support Forum](http://support.embers.city/)
 
 

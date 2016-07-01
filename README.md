@@ -21,7 +21,7 @@ Go to the frontend SSH
   my_computer$ ssh <login>@<site>.iot-lab.info
   <login>@<site>:~$ 
   ```
-Configure IoT-LAB authentication and verify your credentials (print nodes list)
+Configure IoT-LAB authentication and verify your credentials (print IoT-LAB nodes list)
   ```  
   <login>@<site>:~$ auth-cli -u <login>
   <login>@<site>:~$ experiment-cli info -l --site <site>

@@ -62,7 +62,7 @@ PARSER.add_argument('-i',
                     dest='exp_id',
                     type=int,
                     help='experiment id')
-PARSER.add_argument('-u',
+PARSER.add_argument('-url',
                     '--broker-url',
                     dest='broker_url',
                     help='Meshblu device broker url')

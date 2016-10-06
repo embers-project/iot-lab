@@ -20,7 +20,7 @@ if [ -z "${EXP_ID}"]; then
 fi
 readonly SCRIPT_LOG_FILE="${EMBERS_DIR}/${EXP_ID}.log"
 
-SCRIPT_SERIAL="${EMBERS_DIR}/serial_sensors.py"
+SCRIPT_SERIAL="${GIT_EMBERS_DIR}/serial_sensors.py"
 SCRIPT_ARGS="-i ${EXP_ID}"
 SCRIPT_ARGS+=" --broker-url ${BROKER_URL} --gateway-uuid ${GATEWAY_UUID}"
 

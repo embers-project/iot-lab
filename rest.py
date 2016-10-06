@@ -46,15 +46,15 @@ class MeshbluApi(object):
 
     status_codes = [requests.codes.ok, requests.codes.created]
     
-    def __init__(self, url=None, gateway_uuid=None):
-        if self.url is None or self.gateway_uuid is None:
+    def __init__(self, broker_url=None, gateway_uuid=None):
+        if broker_url is None or gateway_uuid is None:
             self.config = utils.get_broker_config(BROKER_NAME)
         else:
-            self.config = get_config(self.url,
-                                     self.gateway_uuid)
+            self.config = get_config(broker_url,
+                                     gateway_uuid)
 
     @classmethod
-    def get_config(cls, url, gateway_uuid):
+    def get_config(cls, broker_url, gateway_uuid):
         return locals()
 
     @classmethod

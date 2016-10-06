@@ -156,6 +156,12 @@ FW_DICT = {
     'serial_sensors': os.path.join(FW_DIR, 'serial_sensors.elf'),
 }
 
+def _update_fw_exp_nodes(iotlab_api, exp_id, exp_nodes, firmware_path):
+    """ Update experiment nodes firmware """
+    files = helpers.FilesDict()
+    files.add_firmware(firmware_path)
+    files['nodes.json'] = json.dumps(exp_nodes.keys())
+    return api.node_update(exp_id, files)
 
 
 def _reset_exp_nodes(iotlab_api, exp_id, exp_nodes):
@@ -238,6 +244,10 @@ def main():
     iotlab_api = iotlabcli.Api(user, passwd)
     exp_id = _get_exp_id(iotlab_api, opts.exp_id)
     exp_nodes = _get_exp_nodes(iotlab_api, exp_id)
+    _update_fw_exp_nodes(iotlab_api,
+                         exp_id,
+                         exp_nodes,
+                         FW_DICT['serial_sensors'])
     # reset nodes to be sure of init firmware execution
     _reset_exp_nodes(iotlab_api, exp_id, exp_nodes)
     broker_api = rest.MeshbluApi(opts.broker_url,

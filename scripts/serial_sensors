@@ -3,7 +3,8 @@
 # Embers github repository
 GIT_REPO_URL="https://github.com/emberscity"
 GIT_REPO_NAME="iot-lab"
-EMBERS_DIR="${HOME}/embers/${GIT_REPO_NAME}"
+EMBERS_DIR="${HOME}/embers"
+GIT_EMBERS_DIR="${EMBERS_DIR}/${GIT_REPO_NAME}"
 
 # Meshblu device broker configuration
 BROKER_URL=""
@@ -24,14 +25,14 @@ SCRIPT_ARGS="-i ${EXP_ID}"
 SCRIPT_ARGS+=" --broker-url ${BROKER_URL} --gateway-uuid ${GATEWAY_UUID}"
 
 git_clone_embers() {
-    if [ ! -d "${EMBERS_DIR}" ]; then
-        mkdir -p ${EMBERS_DIR}
-        git clone ${GIT_REPO_URL}/${GIT_REPO_NAME}.git ${EMBERS_DIR} 
+    if [ ! -d "${GIT_EMBERS_DIR}" ]; then
+        mkdir -p ${GIT_EMBERS_DIR}
+        git clone ${GIT_REPO_URL}/${GIT_REPO_NAME}.git ${GIT_EMBERS_DIR} 
     fi
 }
 
 git_pull_embers() {
-    cd ${EMBERS_DIR} && git pull ; cd -
+    cd ${GIT_EMBERS_DIR} && git pull ; cd -
 }
 
 launch_script() {

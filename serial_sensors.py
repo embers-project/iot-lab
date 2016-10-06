@@ -162,7 +162,7 @@ def _update_fw_exp_nodes(iotlab_api, exp_id, exp_nodes, firmware_path):
     files = helpers.FilesDict()
     files.add_firmware(firmware_path)
     files['nodes.json'] = json.dumps(exp_nodes.keys())
-    return api.node_update(exp_id, files)
+    return iotlab_api.node_update(exp_id, files)
 
 
 def _reset_exp_nodes(iotlab_api, exp_id, exp_nodes):

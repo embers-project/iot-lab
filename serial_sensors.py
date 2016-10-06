@@ -251,8 +251,11 @@ def main():
                          FW_DICT['serial_sensors'])
     # reset nodes to be sure of init firmware execution
     _reset_exp_nodes(iotlab_api, exp_id, exp_nodes)
-    broker_api = rest.MeshbluApi(opts.broker_url,
-                                 opts.gateway_uuid)
+    if (opts.broker_url and opts.gateway_uuid):
+        broker_api = rest.MeshbluApi(opts.broker_url,
+                                     opts.gateway_uuid)
+    else:
+        broker_api = rest.MeshbluApi.from_config('meshblu')
     # store broker devices properties
     broker_devices = _register_broker_devices(broker_api, exp_nodes)
     _aggregate_measure(broker_api, cmd_list, broker_devices)

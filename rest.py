@@ -42,19 +42,18 @@ except ImportError:  # pragma: no cover
 class MeshbluApi(object):
     """ Meshblu REST API """
 
-    BROKER_NAME = 'meshblu'
     status_codes = [requests.codes.ok, requests.codes.created]
     
     def __init__(self, broker_url=None, gateway_uuid=None):
-        if broker_url is None or gateway_uuid is None:
-            self.config = utils.get_broker_config(self.BROKER_NAME)
-        else:
-            self.config = self.get_config(broker_url,
-                                          gateway_uuid)
+        self.broker_url = broker_url
+        self.gateway_uuid = gateway_uuid
 
-    @staticmethod
-    def get_config(broker_url, gateway_uuid):
-        return locals()
+    @classmethod
+    def from_config(cls, config):
+        cfg = utils.get_broker_config(config)
+        broker_url = cfg['broker_url']
+        gateway_uuid = cfg['gateway_uuid']
+        return cls(broker_url, gateway_uuid)
 
     @staticmethod
     def get_headers(auth_uuid, auth_token):
@@ -174,7 +173,7 @@ class MeshbluApi(object):
         :param auth_token: secret token authentication credential
         """
         headers = self.get_headers(auth_uuid, auth_token)
-        message = {"devices": self.config['gateway_uuid'],
+        message = {"devices": self.gateway_uuid,
                    "payload": payload}
         return self.method('messages', 'post',
                            json=message,
@@ -206,7 +205,7 @@ class MeshbluApi(object):
         :param raw: Should data be loaded as json or not
         """
         assert method in ('get', 'post', 'delete', 'put')
-        _url = urljoin(self.config['url'], url)
+        _url = urljoin(self.broker_url, url)
 
         req = requests.request(
             method,

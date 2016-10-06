@@ -62,6 +62,14 @@ PARSER.add_argument('-i',
                     dest='exp_id',
                     type=int,
                     help='experiment id')
+PARSER.add_argument('-u',
+                    '--broker-url',
+                    dest='broker_url',
+                    help='Meshblu device broker url')
+PARSER.add_argument('-uuid',
+                    '--gateway-uuid',
+                    dest='gateway_uuid',
+                    help='Meshblu device broker gateway')
 group_sensors = PARSER.add_argument_group('sensors', 'sensors measure')
 group_parking = PARSER.add_argument_group('parking', 'parking event')
 group_sensors.add_argument('--sensors-period',
@@ -226,7 +234,8 @@ def main():
     exp_nodes = _get_exp_nodes(iotlab_api, exp_id)
     # reset nodes to be sure of init firmware execution
     _reset_exp_nodes(iotlab_api, exp_id, exp_nodes)
-    broker_api = rest.MeshbluApi()
+    broker_api = rest.MeshbluApi(opts.broker_url,
+                                 opts.gateway_uuid)
     # store broker devices properties
     broker_devices = _register_broker_devices(broker_api, exp_nodes)
     _aggregate_measure(broker_api, cmd_list, broker_devices)

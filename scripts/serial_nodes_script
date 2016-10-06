@@ -1,0 +1,52 @@
+#! /bin/bash
+
+# Embers github repository
+GIT_REPO_URL="https://github.com/emberscity"
+GIT_REPO_NAME="iot-lab"
+EMBERS_DIR="${HOME}/embers/${GIT_REPO_NAME}"
+
+# Meshblu device broker configuration
+BROKER_URL=""
+GATEWAY_UUID=""
+
+# Node's measurement configuration
+SENSORS_PERIOD=10
+PARKING_PERIOD=
+
+# IoT-LAB script
+if [ -z "${EXP_ID}"]; then
+    exit 1
+fi
+readonly SCRIPT_LOG_FILE="${EMBERS_DIR}/${EXP_ID}.log"
+
+SCRIPT_SERIAL="${EMBERS_DIR}/serial_nodes.py"
+SCRIPT_ARGS="-i ${EXP_ID}"
+SCRIPT_ARGS+=" --broker-url ${BROKER_URL} --gateway-uuid ${GATEWAY_UUID}"
+
+git_clone_embers() {
+    if [ ! -d "${EMBERS_DIR}" ]; then
+        mkdir -p ${EMBERS_DIR}
+        git clone ${GIT_REPO_URL}/${GIT_REPO_NAME}.git ${EMBERS_DIR} 
+    fi
+}
+
+git_pull_embers() {
+    cd ${EMBERS_DIR} && git pull ; cd -
+}
+
+launch_script() {
+    local script_args=${SCRIPT_ARGS}
+
+    if [ -n "${SENSORS_PERIOD}" ]; then
+       script_args+=" --sensors-period ${SENSORS_PERIOD}"
+    fi
+    if [ -n "${PARKING_PERIOD}" ]; then
+       script_args+=" --parking-period ${PARKING_PERIOD}"   
+    fi 
+
+    script --append --flush --command "${SCRIPT_SERIAL} ${script_args}" ${SCRIPT_LOG_FILE}
+}
+
+git_clone_embers
+git_pull_embers
+launch_script

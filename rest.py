@@ -38,27 +38,26 @@ except ImportError:  # pragma: no cover
     from urllib2 import HTTPError
 
 
-BROKER_NAME = 'meshblu'
-
 # pylint: disable=maybe-no-member,no-member
 class MeshbluApi(object):
     """ Meshblu REST API """
 
+    BROKER_NAME = 'meshblu'
     status_codes = [requests.codes.ok, requests.codes.created]
     
     def __init__(self, broker_url=None, gateway_uuid=None):
         if broker_url is None or gateway_uuid is None:
-            self.config = utils.get_broker_config(BROKER_NAME)
+            self.config = utils.get_broker_config(self.BROKER_NAME)
         else:
-            self.config = get_config(broker_url,
-                                     gateway_uuid)
+            self.config = self.get_config(broker_url,
+                                          gateway_uuid)
 
-    @classmethod
-    def get_config(cls, broker_url, gateway_uuid):
+    @staticmethod
+    def get_config(broker_url, gateway_uuid):
         return locals()
 
-    @classmethod
-    def get_headers(cls, auth_uuid, auth_token):
+    @staticmethod
+    def get_headers(auth_uuid, auth_token):
         """ get headers that will be sent with HTTP request
         """
         return {'meshblu_auth_uuid':auth_uuid, 'meshblu_auth_token':auth_token}

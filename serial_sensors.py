@@ -151,6 +151,12 @@ def _get_exp_nodes(iotlab_api, exp_id):
     resources = experiment.get_experiment(iotlab_api, exp_id, 'resources')['items']
     return dict((res['network_address'], res) for res in resources)
     
+FW_DIR = 'firmwares/'
+FW_DICT = {
+    'serial_sensors': os.path.join(FW_DIR, 'serial_sensors.elf'),
+}
+
+
 
 def _reset_exp_nodes(iotlab_api, exp_id, exp_nodes):
     """ Reset experiment nodes """

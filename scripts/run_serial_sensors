@@ -1,20 +1,27 @@
 #! /bin/bash
 
-# Embers github repository
+#########################
+# Script configuration  #
+#######################################################
+
+# Measurement configuration
+SENSORS_PERIOD=10
+# Not activate by default
+PARKING_PERIOD=
+
+# Meshblu device broker configuration 
+BROKER_URL=""
+GATEWAY_UUID=""
+
+# Github repository configuration
 GIT_REPO_URL="https://github.com/emberscity"
 GIT_REPO_NAME="iot-lab"
 EMBERS_DIR="${HOME}/embers"
 GIT_EMBERS_DIR="${EMBERS_DIR}/${GIT_REPO_NAME}"
 
-# Meshblu device broker configuration
-BROKER_URL=""
-GATEWAY_UUID=""
+#######################################################
 
-# Node's measurement configuration
-SENSORS_PERIOD=10
-PARKING_PERIOD=
 
-# IoT-LAB script
 if [ -z "${EXP_ID}" ]; then
     exit 1
 fi

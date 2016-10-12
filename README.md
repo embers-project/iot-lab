@@ -42,10 +42,10 @@ You must clone this repository on the frontend SSH
 
  ```
  <login>@<site>:~$ mkdir embers && cd embers
- <login>@<site>:~$ git clone https://github.com/embers-project/iot-lab.git
- <login>@<site>:~$ cd iot-lab
+ <login>@<site>:~/embers$ git clone https://github.com/embers-project/iot-lab.git
+ <login>@<site>:~/embers$ cd iot-lab
  ``` 
-We provide you with a binary firmware file (e.g. `firmwares/embers_sensors.elf`) in charge of reading sensor values (e.g. light, temperature, pressure) and simulate parking events. In this test you must use <b>M3 nodes</b> (you can view sensors hardware specification [here](https://www.iot-lab.info/hardware/m3/)), and the parking event simulation is based on a [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution).
+We provide you a binary firmware example (e.g. `firmwares/embers_sensors.elf`) in charge of reading sensor values (e.g. light, temperature, pressure) and simulate parking events. In this test you must use <b>M3 nodes</b> (you can view sensors hardware specification [here](https://www.iot-lab.info/hardware/m3/)), and the parking event simulation is based on a [Poisson distribution](https://en.wikipedia.org/wiki/Poisson_distribution).
 
 You can view the firmware [source code](https://github.com/iot-lab/openlab/tree/master/appli/iotlab_examples/embers_sensors) and how to modify and compile it [here](https://www.iot-lab.info/tutorials/get-compile-a-m3-firmware-code/). It's based on IoT-LAB [OpenLAB](https://github.com/iot-lab/openlab) drivers and [FreeRTOS](http://www.freertos.org/) embedded operating system. 
 
@@ -82,9 +82,9 @@ sensors_on
 sensors_off
 ``` 
 
-Finally you can launch device broker test with [serial_sensors.py](https://github.com/emberscity/iot-lab/blob/master/serial_sensors.py) script. This script will automatically get your experiment nodes list and flash the firmare with CLI-tools library. We also use an IoT-LAB  [Serial Aggregator](https://www.iot-lab.info/tutorials/nodes-serial-link-aggregation/) library, to aggregate all the experiment nodes serial links. Thus the script sends the measurement configuration and receives measures data by serial nodes communication. The last stage is just to send the measurement data to the broker device.
+Finally you can launch device broker test with [serial_sensors.py](https://github.com/emberscity/iot-lab/blob/master/serial_sensors.py) script. This script will automatically get your experiment nodes list and flash the firmare with CLI-tools library. We also use an IoT-LAB  [Serial Aggregator](https://www.iot-lab.info/tutorials/nodes-serial-link-aggregation/) library, to aggregate all the experiment nodes serial links. Thus the script sends the measurement configuration and receives measures data by serial nodes communication. The last stage is the interaction with the device broker like register/unregister devices or send the measurement data.
 
-Currently you can only test a [Meshblu](https://meshblu.readme.io/) device broker implementation with HTTP protocol. You must fill the broker file configuration and Meshblu section (URL and Gateway UUID parameters).
+Actually you can only test a [Meshblu](https://meshblu.readme.io/) device broker implementation with HTTP protocol. You must fill the broker file configuration and Meshblu section (URL and Gateway UUID parameters).
 
 ```
 <login>@<site>:~/embers/iot-lab$ cat broker.cfg
@@ -92,7 +92,7 @@ Currently you can only test a [Meshblu](https://meshblu.readme.io/) device broke
 url= 
 gateway_uuid=
 ``` 
-Finally you should launch the script as follows :
+Finally you should launch the serial_sensors.py script as follows :
 
 ```
 <login>@<site>:~/embers/iot-lab$ ./serial_sensors.py -h
@@ -134,6 +134,6 @@ Next you should launch this script as follows:
 <site> = IoT-LAB site where you run your experiment
 <login>@<site>:~/embers/iot-lab$ experiment-cli --run scripts/run_serial_sensors,<site>
 ```
-> This script writes a log file run_serial_sensors-&lt;exp_id&lt;.log in the embers directory of your home directory on the frontend SSH.
+> The script writes an execution log file &lt;exp_id&lt;.log in the embers directory of your home directory on the frontend SSH.
 
 If you happen to face any problem with these tools, feel free to create an issue [here](https://github.com/embers-project/iot-lab/issues) or in our [Support Forum](http://support.embers.city/)

@@ -120,7 +120,7 @@ Congratulations, you've succesfully launched your first test!
 
 ### Automatic execution
 
-You can launch automatically the script serial_sensors.py on the frontend SSH with IoT-LAB REST API and CLI-tools. You can find in the directory scripts of this repository a [run_serial_sensors](https://github.com/emberscity/iot-lab/blob/master/scripts/run_serial_sensors) script example. You must fill the measurement data and device broker configuratio variables inside this script.
+You can launch automatically the script serial_sensors.py on the frontend SSH with IoT-LAB REST API and CLI-tools. You can find in the directory scripts of this repository a [run_serial_sensors](https://github.com/emberscity/iot-lab/blob/master/scripts/run_serial_sensors) script example. You must fill the measurement data and device broker configuration variables inside this script.
 
 ```
 #########################

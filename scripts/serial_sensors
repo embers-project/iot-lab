@@ -15,7 +15,7 @@ SENSORS_PERIOD=10
 PARKING_PERIOD=
 
 # IoT-LAB script
-if [ -z "${EXP_ID}"]; then
+if [ -z "${EXP_ID}" ]; then
     exit 1
 fi
 readonly SCRIPT_LOG_FILE="${EMBERS_DIR}/${EXP_ID}.log"
@@ -45,7 +45,8 @@ launch_script() {
        script_args+=" --parking-period ${PARKING_PERIOD}"   
     fi 
 
-    script --append --flush --command "${SCRIPT_SERIAL} ${script_args}" ${SCRIPT_LOG_FILE}
+    # Force stdin, stdout and stderr to be totally unbuffered
+    python -u ${SCRIPT_SERIAL} ${script_args} >> ${SCRIPT_LOG_FILE} 2>&1
 }
 
 git_clone_embers

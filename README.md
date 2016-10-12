@@ -2,19 +2,18 @@
 
 This repository contains an SDK for the H2020 [EMBERS](http://www.embers-project.eu/) project. It provides a set of tools for developers to run efficiently experimentation tests from the IoT-Lab. 
 
-### Requirement
+## Requirement
 
 * Ask for an [IoT-LAB](https://www.iot-lab.info/testbed/signup.php) testbed account
 
-### Launch testbed experiment
+## Launch testbed experiment
 
 The first step is to launch an experiment on the IoT-LAB testbed. For this purpose you must choose:
   * an [IoT-LAB site](https://www.iot-lab.info/deployment/)
   * the experiment duration
   * which nodes you will book
-  * (Optionnally) a firmware to flash on the nodes.
 
-You can easily do this action with IoT-LAB [command-line tools](https://www.iot-lab.info/tutorials/experiment-cli-client/) (cli-tools) installed on each IoT-LAB site frontend SSH.
+You can easily do this action with IoT-LAB [command-line tools](https://www.iot-lab.info/tutorials/experiment-cli-client/) (CLI-tools) installed on each IoT-LAB site frontend SSH.
 
 Go to the frontend SSH site
   ```  
@@ -33,16 +32,16 @@ Launch an experiment
   
   # duration = 120 minutes / 50 M3 nodes : m3-1.<site>.iot-lab.info to m3-50.<site>.iot-lab.info
   <login>@<site>:~$ experiment-cli submit -d 120 -l <site>,m3,1-50
-  
-  # duration = 30 minutes / 4 M3 nodes : m3-[1,4,5,6].<site>.iot-lab.info / firmware embers_sensors.elf
-  <login>@<site>:~$ experiment-cli submit -d 30 -l <site>,m3,1+4-6,embers_sensors.elf
   ```
 
-### Launch M2M device broker test
+## Launch M2M device broker test
+
+### Manual execution
 
 You must clone this repository on the frontend SSH
 
- ```  
+ ```
+ <login>@<site>:~$ mkdir embers && cd embers
  <login>@<site>:~$ git clone https://github.com/embers-project/iot-lab.git
  <login>@<site>:~$ cd iot-lab
  ``` 
@@ -50,42 +49,61 @@ We provide you with a binary firmware file (e.g. `firmwares/embers_sensors.elf`)
 
 You can view the firmware [source code](https://github.com/iot-lab/openlab/tree/master/appli/iotlab_examples/embers_sensors) and how to modify and compile it [here](https://www.iot-lab.info/tutorials/get-compile-a-m3-firmware-code/). It's based on IoT-LAB [OpenLAB](https://github.com/iot-lab/openlab) drivers and [FreeRTOS](http://www.freertos.org/) embedded operating system. 
 
-This firmware is configurable (e.g. start measurement with a period) by serial communication. Indeed, on the frontend SSH when the experiment is running you can access all experiment nodes serial port (TCP socket on port 20000) and send commands to the firmware. Moreover the sensors and parking event data is written on the serial port. We use an IoT-LAB library, [serial_aggregator](https://www.iot-lab.info/tutorials/nodes-serial-link-aggregation/), to aggregate all the experiment nodes serial links (python script based on the cli-tools and asyncore events). When we received measures data from serial links nodes we just send it to the broker device.
+This firmware is configurable (e.g. start measurement with a period) by serial communication. Indeed, on the frontend SSH when the experiment is running you can access all experiment nodes serial port (TCP socket on port 20000) and send commands to the firmware. Moreover the sensors and parking event data is written on the serial port.
 
-Verify that your experiment is running :
+Verify that your experiment is running and flash firmware on all experiment nodes :
 
 ```  
-<login>@<site>:~/iot-lab$ experiment-cli wait
+<login>@<site>:~/embers/iot-lab$ experiment-cli wait
 Waiting that experiment <exp_id> gets in state Running
 "Running"
+<login>@<site>:~/embers/iot-lab$ node-cli --update firmwares/embers_sensors.elf
+``` 
+You should test the firmware execution on one experiment node. After the netcat command (e.g. nc) you
+type Enter and print the firmware usage. Next we start sensors measure with "**sensors_on**" and stop
+it with "**sensors_off**" character string. 
+
+```  
+<login>@<site>:~/embers/iot-lab$ nc m3-<id> 20000
+Command              Description
+--------------------------------
+help                 Print this help
+sensors_on           [delay:seconds] Start sensors measure. Default 5s, min 1s
+sensors_off          Stop sensors measure
+parking_on           [average delay:seconds] Start parking simulator. Default 30s, min 1s
+parking_off          Stop parking simulator
+random_on            Add a random delay before starting measures, default ON
+random_off           No random delay before starting measures.
+--------------------------------
+sensors_on
+{"temperature":3.625833E1,"luminosity":1.171875E2,"pressure":9.8937866E2}
+{"temperature":3.628125E1,"luminosity":1.1694336E2,"pressure":9.893745E2}
+{"temperature":3.6260418E1,"luminosity":1.171875E2,"pressure":9.894043E2}
+sensors_off
 ``` 
 
-If you don't launch an experiment with firmware you can simply flash the firmware on all experiments nodes :
-
- ```  
- <login>@<site>:~/iot-lab$ node-cli --update firmwares/embers_sensors.elf
- ``` 
+Finally you can launch device broker test with [serial_sensors.py](https://github.com/emberscity/iot-lab/blob/master/serial_sensors.py) script. This script will automatically get your experiment nodes list and flash the firmare with CLI-tools library. We also use an IoT-LAB  [Serial Aggregator](https://www.iot-lab.info/tutorials/nodes-serial-link-aggregation/) library, to aggregate all the experiment nodes serial links. Thus the script sends the measurement configuration and receives measures data by serial nodes communication. The last stage is just to send the measurement data to the broker device.
 
 Currently you can only test a [Meshblu](https://meshblu.readme.io/) device broker implementation with HTTP protocol. You must fill the broker file configuration and Meshblu section (URL and Gateway UUID parameters).
 
 ```
-<login>@<site>:~/iot-lab$ cat broker.cfg
+<login>@<site>:~/embers/iot-lab$ cat broker.cfg
 [meshblu]
 url= 
 gateway_uuid=
 ``` 
-
-Finally you can launch Meshblu device broker test as follows :
+Finally you should launch the script as follows :
 
 ```
-<login>@<site>:~/iot-lab$ ./serial_nodes.py -h
+<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py -h
 # read sensors with a period of 10 seconds
-<login>@<site>:~/iot-lab$ ./serial_nodes.py --sensors-period 10
+<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --sensors-period 10
 # parking event with a period of 30 seconds (eg. average of 1 event every 30 seconds or 120 events per hour) 
-<login>@<site>:~/iot-lab$ ./serial_nodes.py --sensors-parking 30
-# read sensors and parking event at the same time
-<login>@<site>:~/iot-lab$ ./serial_nodes.py --sensors-period 10 --sensors-parking 30
+<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --sensors-parking 30
+# read sensors and parking even/embers/iot-labt at the same time
+<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --sensors-period 10 --sensors-parking 30
 ``` 
+> If you have many experiments launch at the same time you must specify the experiment id with -i &lt;exp_id&gt; option.
 
 It's an interactive script execution and you can stop manually the execution with Ctrl+C shortcut.
 At the end of the experiment the script will also have ended automatically due to `serial_aggregator` library detection.
@@ -94,11 +112,28 @@ If you want a non interactive execution you can use this command :
 
 ```
 # killed automatically at the end of experiment
-<login>@<site>:~/iot-lab$ nohup ./serial_devices.py --sensors-period 10 > embers_sensors.log 2>&1 &
-``` 
+<login>@<site>:~/embers/iot-lab$ nohup ./serial_sensors.py --sensors-period 10 > embers_sensors.log 2>&1 &
+```
 
 Congratulations, you've succesfully launched your first test!
 
+
+### Automatic execution
+
+You can launch automatically the script serial_sensors.py on the frontend SSH with IoT-LAB REST API and CLI-tools. You can find in the directory scripts of this repository a [run_serial_sensors](https://github.com/emberscity/iot-lab/blob/master/scripts/run_serial_sensors) script example. You must fill the device broker and measurement configuration variables inside this script.
+
+```
+BROKER_URL=""
+GATEWAY_UUID=""
+SENSORS_PERIOD=10
+PARKING_PERIOD=
+```
+Next you should launch this script as follows:
+
+```
+<site> = IoT-LAB site where you run your experiment
+<login>@<site>:~/embers/iot-lab$ experiment-cli --run scripts/run_serial_sensors,<site>
+```
+> This script writes a log file run_serial_sensors-&lt;exp_id&lt;.log in the embers directory of your home directory on the frontend SSH.
+
 If you happen to face any problem with these tools, feel free to create an issue [here](https://github.com/embers-project/iot-lab/issues) or in our [Support Forum](http://support.embers.city/)
-
-

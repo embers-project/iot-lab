@@ -120,13 +120,21 @@ Congratulations, you've succesfully launched your first test!
 
 ### Automatic execution
 
-You can launch automatically the script serial_sensors.py on the frontend SSH with IoT-LAB REST API and CLI-tools. You can find in the directory scripts of this repository a [run_serial_sensors](https://github.com/emberscity/iot-lab/blob/master/scripts/run_serial_sensors) script example. You must fill the device broker and measurement configuration variables inside this script.
+You can launch automatically the script serial_sensors.py on the frontend SSH with IoT-LAB REST API and CLI-tools. You can find in the directory scripts of this repository a [run_serial_sensors](https://github.com/emberscity/iot-lab/blob/master/scripts/run_serial_sensors) script example. You must fill the measurement data and device broker configuratio variables inside this script.
 
 ```
+#########################
+# Script configuration  #
+#######################################################
+
+# Measurement configuration
+SENSORS_PERIOD=10
+# Not activate by default
+PARKING_PERIOD=
+
+# Meshblu device broker configuration 
 BROKER_URL=""
 GATEWAY_UUID=""
-SENSORS_PERIOD=10
-PARKING_PERIOD=
 ```
 Next you should launch this script as follows:
 
@@ -136,7 +144,7 @@ Next you should launch this script as follows:
 ```
 > The run_serial_sensors script writes an execution log file &lt;exp_id&lt;.log in the embers directory of your home directory on the frontend SSH.
 
-The IoT-LAB testbed execute your script on the frontend SSH site in a screen session with your user identity. You can visualize the screen session as well during the script execution.
+The IoT-LAB testbed execute your script on the frontend SSH site in a [screen](https://www.gnu.org/software/screen/manual/screen.html) session with your user identity. You can visualize the screen session as well during the script execution.
 
 ```
 s<login>@<site>:~/embers/iot-lab$ screen -ls

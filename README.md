@@ -132,8 +132,23 @@ Next you should launch this script as follows:
 
 ```
 <site> = IoT-LAB site where you run your experiment
-<login>@<site>:~/embers/iot-lab$ experiment-cli --run scripts/run_serial_sensors,<site>
+<login>@<site>:~/embers/iot-lab$ experiment-cli script --run scripts/run_serial_sensors,<site>
 ```
-> The script writes an execution log file &lt;exp_id&lt;.log in the embers directory of your home directory on the frontend SSH.
+> The run_serial_sensors script writes an execution log file &lt;exp_id&lt;.log in the embers directory of your home directory on the frontend SSH.
+
+The IoT-LAB testbed execute your script on the frontend SSH site in a screen session with your user identity. You can visualize the screen session as well during the script execution.
+
+```
+s<login>@<site>:~/embers/iot-lab$ screen -ls
+There is a screen on:
+	536.<exp_id>-<login>	(12/10/2016 10:49:12)	(Detached)
+1 Socket in /var/run/screen/S-<login>.
+```
+You can also control the status of the script execution and stop it manually. At the end of the experiment when we receive a stop experiment request by the scheduler if a script is running it will be killed automatically.
+
+```
+<login>@<site>:~/embers/iot-lab$ experiment-cli script --status
+<login>@<site>:~/embers/iot-lab$ experiment-cli script --kill
+```
 
 If you happen to face any problem with these tools, feel free to create an issue [here](https://github.com/embers-project/iot-lab/issues) or in our [Support Forum](http://support.embers.city/)

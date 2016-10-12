@@ -22,7 +22,14 @@
 
 
 """
+Serial sensors script: it flashes a firmware on experiment nodes
+and runs serial aggregator library on the frontend SSH. By serial
+communication we send measurement configuration to the nodes and
+gather measurement data. Finally the measurement data is sending to
+Meshblu broker device.
 """
+
+from __future__ import print_function
 import os
 import argparse
 import signal
@@ -31,20 +38,18 @@ import datetime
 import Queue
 import threading
 import json
-import rest
 import sys
 import iotlabcli.parser.common
 from iotlabcli import experiment, get_user_credentials
 from iotlabcli import helpers
 from iotlabaggregator.serial import SerialAggregator
+import rest
 # pylint: disable=import-error,no-name-in-module
 # pylint: disable=wrong-import-order
 try:  # pragma: no cover
-    from urllib.parse import urljoin
     from urllib.error import HTTPError
 except ImportError:  # pragma: no cover
     # pylint: disable=import-error,no-name-in-module
-    from urlparse import urljoin
     from urllib2 import HTTPError
 
 PERIOD_METAVAR = '[1-3600]'
@@ -70,6 +75,7 @@ PARSER.add_argument('-uuid',
                     '--gateway-uuid',
                     dest='gateway_uuid',
                     help='Meshblu device broker gateway')
+# pylint: disable=C0103
 group_sensors = PARSER.add_argument_group('sensors', 'sensors measure')
 group_parking = PARSER.add_argument_group('parking', 'parking event')
 group_sensors.add_argument('--sensors-period',
@@ -86,8 +92,9 @@ group_parking.add_argument('--parking-period',
 
 class MeasureHandler(threading.Thread):
     """
+    Measure thread handler.
     """
- 
+
     def __init__(self, broker_api, broker_devices):
         threading.Thread.__init__(self)
         # thread safe message queue
@@ -95,8 +102,7 @@ class MeasureHandler(threading.Thread):
         self.running = False
         self.broker_api = broker_api
         self.broker_devices = broker_devices
-        
-    
+
     def run(self):
         self.running = True
         while self.running:
@@ -106,48 +112,50 @@ class MeasureHandler(threading.Thread):
                 if device in self.broker_devices:
                     props = self.broker_devices[device]
                     res = self.broker_api.send_message(payload,
-                                            props['uuid'],
-                                            props['token'])
-                    print res
+                                                       props['uuid'],
+                                                       props['token'])
+                    print(res)
                 else:
-                    print "Unknown %s device send message" % device
+                    print("Unknown %s device send message" % device)
             except Queue.Empty:
                 pass
             except HTTPError, err:
-                print 'Send message %s device error : %s' % (device, err)
-    
+                print('Send message %s device error : %s' % (device, err))
+
     def stop(self):
+        """ Stop measure.
+        """
         self.running = False
         self.join()
-    
+
     def handle_measure(self, identifier, line):
-        """ 
+        """ Handle measure on the serial port.
         """
         try:
             data = json.loads(line)
             now = datetime.datetime.now()
             # TODO
             # add ControlNode timestamp instead of frontend SSH
-            timestamp = time.mktime(now.timetuple())  
-            data['timestamp'] = timestamp 
+            timestamp = time.mktime(now.timetuple())
+            data['timestamp'] = timestamp
         except ValueError:
             # we ignore lines not in JSON format
             return
-        
+
         self.queue.put({identifier : data})
 
 
 def _get_exp_id(iotlab_api, exp_id):
+    """ Get experiment id """
     try:
         return helpers.get_current_experiment(iotlab_api, exp_id)
     except ValueError, err:
-        print err
+        print(err)
         sys.exit(1)
 
 
 def _get_exp_nodes(iotlab_api, exp_id):
-    """ Return experiment nodes with properties """
-    exp_nodes = {}
+    """ Get experiment nodes properties """
     resources = experiment.get_experiment(iotlab_api, exp_id, 'resources')['items']
     return dict((res['network_address'], res) for res in resources)
 
@@ -175,38 +183,38 @@ NODE_ATTR = ['network_address', 'uid', 'site', 'archi']
 
 def _register_broker_devices(broker_api, exp_nodes):
     """
-    Register experiment nodes with broker
+    Register experiment nodes with device broker.
     """
     broker_devices = {}
     payload = {'type': 'sensor'}
     for node, props in exp_nodes.iteritems():
         for attr in NODE_ATTR:
             payload.update({attr: props[attr]})
-        try: 
+        try:
             res = broker_api.register_device(payload)
             broker_devices[node] = res
-            print 'Register %s device : uuid=%s token=%s' % (node, res['uuid'], res['token'])
+            print('Register %s device : uuid=%s token=%s' % (node, res['uuid'], res['token']))
         except HTTPError, err:
-            print 'Register %s device error : %s' % (node, err)
+            print('Register %s device error : %s' % (node, err))
     return broker_devices
-    
-    
+
+
 def _unregister_broker_devices(broker_api, broker_devices):
     """
-    Unregister experiment nodes with broker
+    Unregister experiment nodes with broker device.
     """
     for device, props in broker_devices.iteritems():
         try:
             res = broker_api.unregister_device(props['uuid'],
-                                  props['uuid'],
-                                  props['token'])
-            print 'Unregister %s device : uuid=%s' % (device, res['uuid'])
+                                               props['uuid'],
+                                               props['token'])
+            print('Unregister %s device : uuid=%s' % (device, res['uuid']))
         except HTTPError, err:
-            print 'Unregister %s device error : %s' % (device, err)
-    
-    
+            print('Unregister %s device error : %s' % (device, err))
+
+
 def _aggregate_measure(broker_api, cmd_list, broker_devices):
-    """
+    """ Launch serial aggregator on the frontend SSH.
     """
     m_handler = MeasureHandler(broker_api, broker_devices)
     m_handler.start()
@@ -218,20 +226,28 @@ def _aggregate_measure(broker_api, cmd_list, broker_devices):
             for cmd in cmd_list:
                 print('Launch command : %s' % cmd)
                 aggregator.broadcast(cmd+'\n')
-            print 'Press Ctrl+C to quit'
+            print('Press Ctrl+C to quit')
             super(SerialAggregator, aggregator).run()
 
     except RuntimeError as err:
         sys.stderr.write("%s\n" % err)
         exit(1)
     finally:
-        print 'Stop handler measure'
+        print('Stop handler measure')
         m_handler.stop()
-        
-    
+
+# pylint: disable=unused-argument
+def _sighup_handler(signum, frame):
+    """ catch SIGHUP signal when you kill run script
+    or the experiment is stopped by the scheduler.
+    It raises a keyboard exception (e.g. Ctrl-C) for
+    stopping serial aggregator and unregister devices.
+    """
+    raise KeyboardInterrupt
 
 def main():
     """
+    Main serial sensors script.
     """
     cmd_list = []
     opts = PARSER.parse_args()
@@ -256,12 +272,15 @@ def main():
                                      opts.gateway_uuid)
     else:
         broker_api = rest.MeshbluApi.from_config('meshblu')
-    # store broker devices properties
     broker_devices = _register_broker_devices(broker_api, exp_nodes)
+
+    signal.signal(signal.SIGHUP, _sighup_handler)
     _aggregate_measure(broker_api, cmd_list, broker_devices)
+    signal.signal(signal.SIGHUP, signal.SIG_DFL)
+
     _unregister_broker_devices(broker_api, broker_devices)
 
-            
+
 if __name__ == '__main__':
     main()
-    
+

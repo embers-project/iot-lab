@@ -219,23 +219,18 @@ def _aggregate_measure(broker_api, cmd_list, broker_devices):
     """
     m_handler = MeasureHandler(broker_api, broker_devices)
     m_handler.start()
-    try:
-        with SerialAggregator(broker_devices.keys(),
-                              line_handler=m_handler.handle_measure) as aggregator:
-            # wait serial aggregator connected
-            time.sleep(5)
-            for cmd in cmd_list:
-                print('Launch command : %s' % cmd)
-                aggregator.broadcast(cmd+'\n')
-            print('Press Ctrl+C to quit')
-            super(SerialAggregator, aggregator).run()
+    with SerialAggregator(broker_devices.keys(),
+                          line_handler=m_handler.handle_measure) as aggregator:
+        # wait serial aggregator connected
+        time.sleep(5)
+        for cmd in cmd_list:
+            print('Launch command : %s' % cmd)
+            aggregator.broadcast(cmd+'\n')
+        print('Press Ctrl+C to quit')
+        super(SerialAggregator, aggregator).run()
 
-    except RuntimeError as err:
-        sys.stderr.write("%s\n" % err)
-        exit(1)
-    finally:
-        print('Stop handler measure')
-        m_handler.stop()
+    print('Stop handler measure')
+    m_handler.stop()
 
 # pylint: disable=unused-argument
 def _sighup_handler(signum, frame):

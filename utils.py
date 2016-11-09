@@ -23,6 +23,7 @@
 """Utils methods"""
 
 import sys
+import csv
 from ConfigParser import SafeConfigParser, ParsingError
 
 CONFIG_FILE = 'broker.cfg'
@@ -59,8 +60,26 @@ def get_iotlab_attrs(exp_nodes):
         attr_nodes[node] = attrs
     return attr_nodes
 
+def get_iotlab_parking_coordinates(site):
+    iotlab_parking_coordinates = {}
+    with open('coordinates/parking/%s.csv' % site) as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            node = '%s.%s.iot-lab.info' % (row['node'], site)
+            iotlab_parking_coordinates[node] = \
+                {'longitude': row['longitude'], 'latitude': row['latitude']}
+    return iotlab_parking_coordinates
+
 def get_parking_coordinates(exp_nodes):
-    return {}
+    iotlab_parking_coordinates = {}
+    parking_coordinates = {}
+    for node, attr in exp_nodes.iteritems():
+        if node not in iotlab_parking_coordinates:
+            iotlab_parking_coordinates.update(get_iotlab_parking_coordinates(attr['site']))
+        # static allocation only for a subset of iotlab nodes site
+        if node in iotlab_parking_coordinates:
+            parking_coordinates[node] = iotlab_parking_coordinates[node]
+    return parking_coordinates
 
 def get_traffic_coordinates(exp_nodes):
     return {}

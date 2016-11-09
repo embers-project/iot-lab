@@ -23,14 +23,13 @@
 """Utils methods"""
 
 import sys
-import json
 from ConfigParser import SafeConfigParser, ParsingError
 
 CONFIG_FILE = 'broker.cfg'
 
 def get_broker_config(broker_name):
     try:
-        parser = SafeConfigParser()  
+        parser = SafeConfigParser()
         with open(CONFIG_FILE) as conf_f:
             parser.readfp(conf_f)
             if parser.has_section(broker_name):
@@ -49,5 +48,38 @@ def get_broker_config(broker_name):
         print err
         sys.exit(1)
 
+NODE_ATTR = ['network_address', 'uid', 'site', 'archi']
 
-        
+def get_iotlab_attrs(exp_nodes):
+    attr_nodes = {}
+    for node, props in exp_nodes.iteritems():
+        attrs = {}
+        for attr in NODE_ATTR:
+            attrs.update({attr: props[attr]})
+        attr_nodes[node] = attrs
+    return attr_nodes
+
+def get_parking_coordinates(exp_nodes):
+    return {}
+
+def get_traffic_coordinates(exp_nodes):
+    return {}
+
+def get_attr_nodes(opts, node_type, exp_nodes):
+    if opts.traffic:
+        coordinates = get_traffic_coordinates(exp_nodes)
+    else:
+        coordinates = get_parking_coordinates(exp_nodes)
+
+    iotlab_attrs = get_iotlab_attrs(exp_nodes)
+
+    attr_nodes = {}
+    for node in exp_nodes:
+        attr_nodes[node] = {'type': node_type}
+    for node in iotlab_attrs:
+        attr_nodes[node].update(iotlab_attrs[node])
+    for node in coordinates:
+        attr_nodes[node].update(coordinates[node])
+
+    return attr_nodes
+

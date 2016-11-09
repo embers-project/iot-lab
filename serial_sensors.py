@@ -44,6 +44,7 @@ from iotlabcli import experiment, get_user_credentials
 from iotlabcli import helpers
 from iotlabaggregator.serial import SerialAggregator
 import rest
+import utils
 # pylint: disable=import-error,no-name-in-module
 # pylint: disable=wrong-import-order
 try:  # pragma: no cover
@@ -76,19 +77,24 @@ PARSER.add_argument('-uuid',
                     dest='gateway_uuid',
                     help='Meshblu device broker gateway')
 # pylint: disable=C0103
-group_sensors = PARSER.add_argument_group('sensors', 'sensors measure')
-group_parking = PARSER.add_argument_group('parking', 'parking event')
-group_sensors.add_argument('--sensors-period',
-                           type=(lambda x: ('sensors_on %d' % _check_period(x))),
-                           metavar=PERIOD_METAVAR,
-                           help='measure period in seconds',
-                           dest='sensors')
-group_parking.add_argument('--parking-period',
-                           type=(lambda x: ('parking_on %d' % _check_period(x))),
-                           metavar=PERIOD_METAVAR,
-                           help='parking event period in seconds (eg. Poisson distribution)',
-                           dest='parking')
-
+group = PARSER.add_mutually_exclusive_group(required=True)
+group.add_argument('--sensors',
+                   type=(lambda x: ('sensors_on %d' % _check_period(x))),
+                   metavar=PERIOD_METAVAR,
+                   help='sensors measure period in seconds',
+                   dest='sensors')
+group.add_argument('--parking',
+                   type=(lambda x: ('parking_on %d' % _check_period(x))),
+                   metavar=PERIOD_METAVAR,
+                   help='parking event measure period in seconds (eg. Poisson distribution)',
+                   dest='parking')
+group.add_argument('--traffic',
+                   action='store_true',
+                   help='traffic event measure',
+                   dest='traffic')
+group.add_argument('--flash',
+                   action='store_true',
+                   help='flash firmware')
 
 class MeasureHandler(threading.Thread):
     """
@@ -182,17 +188,14 @@ def _reset_exp_nodes(iotlab_api, exp_id, exp_nodes):
 NODE_ATTR = ['network_address', 'uid', 'site', 'archi']
 
 
-def _register_broker_devices(broker_api, exp_nodes):
+def _register_broker_devices(broker_api, attr_nodes):
     """
     Register experiment nodes with device broker.
     """
     broker_devices = {}
-    payload = {'type': 'sensor'}
-    for node, props in exp_nodes.iteritems():
-        for attr in NODE_ATTR:
-            payload.update({attr: props[attr]})
+    for node, attr in attr_nodes.iteritems():
         try:
-            res = broker_api.register_device(payload)
+            res = broker_api.register_device(attr)
             broker_devices[node] = res
             print('Register %s device : uuid=%s token=%s' % (node, res['uuid'], res['token']))
         except HTTPError, err:
@@ -214,7 +217,7 @@ def _unregister_broker_devices(broker_api, broker_devices):
             print('Unregister %s device error : %s' % (device, err))
 
 
-def _aggregate_measure(broker_api, cmd_list, broker_devices):
+def _aggregate_measure(broker_api, cmd, broker_devices):
     """ Launch serial aggregator on the frontend SSH.
     """
     m_handler = MeasureHandler(broker_api, broker_devices)
@@ -223,12 +226,12 @@ def _aggregate_measure(broker_api, cmd_list, broker_devices):
                           line_handler=m_handler.handle_measure) as aggregator:
         # wait serial aggregator connected
         time.sleep(5)
-        for cmd in cmd_list:
+        if cmd:
             print('Launch command : %s' % cmd)
             aggregator.broadcast(cmd+'\n')
+
         print('Press Ctrl+C to quit')
         super(SerialAggregator, aggregator).run()
-
     print('Stop handler measure')
     m_handler.stop()
 
@@ -239,39 +242,51 @@ def _sighup_handler(signum, frame):
     It raises a keyboard exception (e.g. Ctrl-C) for
     stopping serial aggregator and unregister devices.
     """
+    print('SIGHUP signal handler')
     raise KeyboardInterrupt
 
-def main():
-    """
-    Main serial sensors script.
-    """
-    cmd_list = []
-    opts = PARSER.parse_args()
-    if not opts.sensors and not opts.parking:
-        PARSER.error("You must specify at least one period argument")
-    if opts.sensors:
-        cmd_list.append(opts.sensors)
-    if opts.parking:
-        cmd_list.append(opts.parking)
-    user, passwd = get_user_credentials(opts.username, opts.password)
-    iotlab_api = iotlabcli.Api(user, passwd)
-    exp_id = _get_exp_id(iotlab_api, opts.exp_id)
-    exp_nodes = _get_exp_nodes(iotlab_api, exp_id)
-    _update_fw_exp_nodes(iotlab_api,
-                         exp_id,
-                         exp_nodes,
-                         FW_DICT['serial_sensors'])
-    # reset nodes to be sure of init firmware execution
-    _reset_exp_nodes(iotlab_api, exp_id, exp_nodes)
+
+def _get_broker_api(opts):
     if (opts.broker_url and opts.gateway_uuid):
         broker_api = rest.MeshbluApi(opts.broker_url,
                                      opts.gateway_uuid)
     else:
         broker_api = rest.MeshbluApi.from_config('meshblu')
-    broker_devices = _register_broker_devices(broker_api, exp_nodes)
+    return broker_api
+
+
+def main():
+    """
+    Main serial sensors script.
+    """
+    opts = PARSER.parse_args()
+    user, passwd = get_user_credentials(opts.username, opts.password)
+    iotlab_api = iotlabcli.Api(user, passwd)
+    exp_id = _get_exp_id(iotlab_api, opts.exp_id)
+    exp_nodes = _get_exp_nodes(iotlab_api, exp_id)
+    if (opts.flash):
+        _update_fw_exp_nodes(iotlab_api,
+                             exp_id,
+                             exp_nodes,
+                             FW_DICT['serial_sensors'])
+        return
+    if (opts.sensors):
+        cmd = opts.sensors
+        node_type = 'sensor'
+    if (opts.parking):
+        cmd = opts.parking
+        node_type = 'parking'
+    if (opts.traffic):
+        cmd = None
+        node_type = 'traffic'
+    # reset nodes to be sure of init firmware execution
+    _reset_exp_nodes(iotlab_api, exp_id, exp_nodes)
+    broker_api = _get_broker_api(opts)
+    attr_nodes = utils.get_attr_nodes(opts, node_type, exp_nodes)
+    broker_devices = _register_broker_devices(broker_api, attr_nodes)
 
     signal.signal(signal.SIGHUP, _sighup_handler)
-    _aggregate_measure(broker_api, cmd_list, broker_devices)
+    _aggregate_measure(broker_api, cmd, broker_devices)
     signal.signal(signal.SIGHUP, signal.SIG_DFL)
 
     _unregister_broker_devices(broker_api, broker_devices)

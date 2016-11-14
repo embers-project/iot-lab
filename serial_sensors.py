@@ -255,6 +255,10 @@ def _get_broker_api(opts):
     return broker_api
 
 
+def _handle_traffic_data(broker_api, broker_devices, attr_nodes):
+    pass
+
+
 def main():
     """
     Main serial sensors script.
@@ -286,7 +290,10 @@ def main():
     broker_devices = _register_broker_devices(broker_api, attr_nodes)
 
     signal.signal(signal.SIGHUP, _sighup_handler)
-    _aggregate_measure(broker_api, cmd, broker_devices)
+    if opts.traffic:
+        _handle_traffic_data(broker_api, broker_devices, attr_nodes)
+    else:
+        _aggregate_measure(broker_api, cmd, broker_devices)
     signal.signal(signal.SIGHUP, signal.SIG_DFL)
 
     _unregister_broker_devices(broker_api, broker_devices)

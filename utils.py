@@ -95,8 +95,9 @@ def get_traffic_metadata(exp_nodes):
 
 def get_traffic_data_readers(attr_nodes):
     data_readers = {}
+    datafile_path = 'datasets/citypulse/traffic_feb_june/trafficData%s.csv'
     for node, attr in attr_nodes.iteritems():
-        csvfile = open('datasets/citypulse/traffic_feb_june/trafficData%s.csv' % attr['REPORT_ID'])
+        csvfile = open(datafile_path % attr['REPORT_ID'])
         data_readers[node] = csv.DictReader(csvfile)
     return data_readers
 

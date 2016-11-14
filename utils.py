@@ -95,9 +95,9 @@ def get_traffic_metadata(exp_nodes):
 
 def get_attr_nodes(opts, node_type, exp_nodes):
     if opts.traffic:
-        coordinates = get_traffic_metadata(exp_nodes)
+        metadata = get_traffic_metadata(exp_nodes)
     else:
-        coordinates = get_parking_coordinates(exp_nodes)
+        metadata = get_parking_coordinates(exp_nodes)
 
     iotlab_attrs = get_iotlab_attrs(exp_nodes)
 
@@ -106,8 +106,8 @@ def get_attr_nodes(opts, node_type, exp_nodes):
         attr_nodes[node] = {'type': node_type}
     for node in iotlab_attrs:
         attr_nodes[node].update(iotlab_attrs[node])
-    for node in coordinates:
-        attr_nodes[node].update(coordinates[node])
+    for node in metadata:
+        attr_nodes[node].update(metadata[node])
 
     return attr_nodes
 

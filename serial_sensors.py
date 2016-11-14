@@ -147,6 +147,7 @@ class MeasureHandler(threading.Thread):
             data['timestamp'] = timestamp
         except ValueError:
             # we ignore lines not in JSON format
+            #print(line)
             return
 
         self.queue.put({identifier : data})

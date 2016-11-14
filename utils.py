@@ -82,7 +82,16 @@ def get_parking_coordinates(exp_nodes):
     return parking_coordinates
 
 def get_traffic_coordinates(exp_nodes):
-    return {}
+    traffic_metadata = {}
+    with open('datasets/citypulse/traffic_metadata.csv') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for node, attr in exp_nodes.iteritems():
+            metadata = reader.next()
+            for discard in [ 'REPORT_NAME', 'RBA_ID', '_id' ]:
+                del metadata[discard]
+            traffic_metadata[node] = metadata
+
+    return traffic_metadata
 
 def get_attr_nodes(opts, node_type, exp_nodes):
     if opts.traffic:

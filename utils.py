@@ -81,7 +81,7 @@ def get_parking_coordinates(exp_nodes):
             parking_coordinates[node] = iotlab_parking_coordinates[node]
     return parking_coordinates
 
-def get_traffic_coordinates(exp_nodes):
+def get_traffic_metadata(exp_nodes):
     traffic_metadata = {}
     with open('datasets/citypulse/traffic_metadata.csv') as csvfile:
         reader = csv.DictReader(csvfile)
@@ -95,7 +95,7 @@ def get_traffic_coordinates(exp_nodes):
 
 def get_attr_nodes(opts, node_type, exp_nodes):
     if opts.traffic:
-        coordinates = get_traffic_coordinates(exp_nodes)
+        coordinates = get_traffic_metadata(exp_nodes)
     else:
         coordinates = get_parking_coordinates(exp_nodes)
 

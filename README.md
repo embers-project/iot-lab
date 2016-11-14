@@ -97,11 +97,11 @@ Finally you should launch the serial_sensors.py script as follows :
 ```
 <login>@<site>:~/embers/iot-lab$ ./serial_sensors.py -h
 # read sensors with a period of 10 seconds
-<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --sensors-period 10
+<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --sensors 10
 # parking event with a period of 30 seconds (eg. average of 1 event every 30 seconds or 120 events per hour) 
-<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --sensors-parking 30
-# read sensors and parking even/embers/iot-labt at the same time
-<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --sensors-period 10 --sensors-parking 30
+<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --parking 30
+# traffic events read from dataset every 5 seconds
+<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --traffic
 ``` 
 > If you have many experiments launch at the same time you must specify the experiment id with -i &lt;exp_id&gt; option.
 
@@ -112,7 +112,7 @@ If you want a non interactive execution you can use this command :
 
 ```
 # killed automatically at the end of experiment
-<login>@<site>:~/embers/iot-lab$ nohup ./serial_sensors.py --sensors-period 10 > embers_sensors.log 2>&1 &
+<login>@<site>:~/embers/iot-lab$ nohup ./serial_sensors.py --sensors 10 > embers_sensors.log 2>&1 &
 ```
 
 Congratulations, you've succesfully launched your first test!

@@ -257,7 +257,17 @@ def _get_broker_api(opts):
 
 
 def _handle_traffic_data(broker_api, broker_devices, attr_nodes):
-    pass
+    readers = utils.get_traffic_data_readers(attr_nodes)
+    m_handler = MeasureHandler(broker_api, broker_devices)
+    m_handler.start()
+    with SerialAggregator(broker_devices.keys(),
+                          line_handler=m_handler.handle_measure) as aggregator:
+        while True:
+            time.sleep(5)
+            for node in attr_nodes:
+                payload = utils.get_traffic_payload(readers[node])
+                aggregator.send_nodes([node], payload + "\n")
+    m_handler.stop()
 
 
 def main():

@@ -93,6 +93,18 @@ def get_traffic_metadata(exp_nodes):
 
     return traffic_metadata
 
+def get_traffic_data_readers(attr_nodes):
+    data_readers = {}
+    for node, attr in attr_nodes.iteritems():
+        csvfile = open('datasets/citypulse/traffic_feb_june/trafficData%s.csv' % attr['REPORT_ID'])
+        data_readers[node] = csv.DictReader(csvfile)
+    return data_readers
+
+def get_traffic_payload(reader):
+    vehicle_count = reader.next()['vehicleCount']
+    payload = "traffic %s" % vehicle_count
+    return payload
+
 def get_attr_nodes(opts, node_type, exp_nodes):
     if opts.traffic:
         metadata = get_traffic_metadata(exp_nodes)

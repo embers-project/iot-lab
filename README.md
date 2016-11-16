@@ -103,7 +103,12 @@ Finally you should launch the serial_sensors.py script as follows :
 # traffic events read from dataset every 5 seconds
 <login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --traffic
 ``` 
+
 > If you have many experiments launch at the same time you must specify the experiment id with -i &lt;exp_id&gt; option.
+
+Note: for --traffic to work, un-tar the dataset in `datasets/citypulse/`
+      with the following command: `tar xf traffic_feb_jun_2014.tar.bz2`
+      as a one-time operation.
 
 It's an interactive script execution and you can stop manually the execution with Ctrl+C shortcut.
 At the end of the experiment the script will also have ended automatically due to `serial_aggregator` library detection.

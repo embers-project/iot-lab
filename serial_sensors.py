@@ -143,6 +143,9 @@ def _register_broker_devices(broker_api, attr_nodes):
             print('Register %s device : uuid=%s token=%s' % (node, res['uuid'], res['token']))
         except HTTPError, err:
             print('Register %s device error : %s' % (node, err))
+        except ConnectionError:
+            print('connection error, aborting.  Devices NOT un-registered')
+            sys.exit(2)
     return broker_devices
 
 

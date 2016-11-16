@@ -57,7 +57,7 @@ Verify that your experiment is running and flash firmware on all experiment node
 <login>@<site>:~/embers/iot-lab$ experiment-cli wait
 Waiting that experiment <exp_id> gets in state Running
 "Running"
-<login>@<site>:~/embers/iot-lab$ node-cli --update firmwares/embers_sensors.elf
+<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --flash
 ``` 
 You should test the firmware execution on one experiment node. After the netcat command (e.g. nc) you
 type Enter and print the firmware usage. Next we start sensors measure with "**sensors_on**" and stop

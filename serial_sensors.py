@@ -34,9 +34,6 @@ import os
 import argparse
 import signal
 import time
-import datetime
-import Queue
-import threading
 import json
 import sys
 import iotlabcli.parser.common
@@ -45,6 +42,8 @@ from iotlabcli import helpers
 from iotlabaggregator.serial import SerialAggregator
 import rest
 import utils
+import data_handler
+
 # pylint: disable=import-error,no-name-in-module
 # pylint: disable=wrong-import-order
 try:  # pragma: no cover
@@ -95,63 +94,6 @@ group.add_argument('--traffic',
 group.add_argument('--flash',
                    action='store_true',
                    help='flash firmware')
-
-class MeasureHandler(threading.Thread):
-    """
-    Measure thread handler.
-    """
-
-    def __init__(self, broker_api, broker_devices):
-        threading.Thread.__init__(self)
-        # thread safe message queue
-        self.queue = Queue.Queue()
-        self.running = False
-        self.broker_api = broker_api
-        self.broker_devices = broker_devices
-
-    def run(self):
-        self.running = True
-        while self.running:
-            try:
-                data = self.queue.get(block=True, timeout=1)
-                device, payload = data.popitem()
-                if device in self.broker_devices:
-                    props = self.broker_devices[device]
-                    res = self.broker_api.send_message(payload,
-                                                       props['uuid'],
-                                                       props['token'])
-                    now = datetime.datetime.now()
-                    print(now.isoformat(), device, res)
-                else:
-                    print("Unknown %s device send message" % device)
-            except Queue.Empty:
-                pass
-            except HTTPError, err:
-                print('Send message %s device error : %s' % (device, err))
-
-    def stop(self):
-        """ Stop measure.
-        """
-        self.running = False
-        self.join()
-
-    def handle_measure(self, identifier, line):
-        """ Handle measure on the serial port.
-        """
-        try:
-            data = json.loads(line)
-            now = datetime.datetime.now()
-            # TODO
-            # add ControlNode timestamp instead of frontend SSH
-            timestamp = time.mktime(now.timetuple())
-            data['timestamp'] = timestamp
-        except ValueError:
-            # we ignore lines not in JSON format
-            #print(line)
-            return
-
-        self.queue.put({identifier : data})
-
 
 def _get_exp_id(iotlab_api, exp_id):
     """ Get experiment id """
@@ -221,10 +163,10 @@ def _unregister_broker_devices(broker_api, broker_devices):
 def _aggregate_measure(broker_api, cmd, broker_devices):
     """ Launch serial aggregator on the frontend SSH.
     """
-    m_handler = MeasureHandler(broker_api, broker_devices)
+    m_handler = data_handler.MeasureHandler(broker_api, broker_devices)
     m_handler.start()
     with SerialAggregator(broker_devices.keys(),
-                          line_handler=m_handler.handle_measure) as aggregator:
+                          line_handler=data_handler.handle_measure) as aggregator:
         # wait serial aggregator connected
         time.sleep(5)
         if cmd:
@@ -258,11 +200,11 @@ def _get_broker_api(opts):
 
 def _handle_traffic_data(broker_api, broker_devices, attr_nodes):
     readers = utils.get_traffic_data_readers(attr_nodes)
-    m_handler = MeasureHandler(broker_api, broker_devices)
+    m_handler = data_handler.MeasureHandler(broker_api, broker_devices)
     m_handler.start()
     try:
         _do_handle_traffic(broker_devices.keys(), readers,
-                           m_handler.handle_measure)
+                           data_handler.handle_measure)
     except KeyboardInterrupt:
         print("interrupted by user, stopping...")
     m_handler.stop()

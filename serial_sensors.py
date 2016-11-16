@@ -166,8 +166,7 @@ def _unregister_broker_devices(broker_api, broker_devices):
 def _aggregate_measure(broker_api, cmd, broker_devices):
     """ Launch serial aggregator on the frontend SSH.
     """
-    m_handler = data_handler.MeasureHandler(broker_api, broker_devices)
-    m_handler.start()
+    workers = spawn_workers(broker_api, broker_devices)
     with SerialAggregator(broker_devices.keys(),
                           line_handler=data_handler.handle_measure) as aggregator:
         # wait serial aggregator connected
@@ -179,7 +178,8 @@ def _aggregate_measure(broker_api, cmd, broker_devices):
         print('Press Ctrl+C to quit')
         super(SerialAggregator, aggregator).run()
     print('Stop handler measure')
-    m_handler.stop()
+    for worker in workers:
+        worker.stop()
 
 # pylint: disable=unused-argument
 def _sighup_handler(signum, frame):
@@ -200,17 +200,24 @@ def _get_broker_api(opts):
         broker_api = rest.MeshbluApi.from_config('meshblu')
     return broker_api
 
+def spawn_workers(broker_api, broker_devices):
+    workers = []
+    for device in broker_devices:
+        w = data_handler.MeasureHandler(broker_api, broker_devices)
+        w.start()
+        workers.append(w)
+    return workers
 
 def _handle_traffic_data(broker_api, broker_devices, attr_nodes):
     readers = utils.get_traffic_data_readers(attr_nodes)
-    m_handler = data_handler.MeasureHandler(broker_api, broker_devices)
-    m_handler.start()
+    workers = spawn_workers(broker_api, broker_devices)
     try:
         _do_handle_traffic(broker_devices.keys(), readers,
                            data_handler.handle_measure)
     except KeyboardInterrupt:
         print("interrupted by user, stopping...")
-    m_handler.stop()
+    for worker in workers:
+        worker.stop()
 
 def _do_handle_traffic(nodes, readers, line_handler):
     with SerialAggregator(nodes, line_handler=line_handler) as aggregator:

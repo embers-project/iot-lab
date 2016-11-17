@@ -77,11 +77,11 @@ PARSER.add_argument('-uuid',
                     help='Meshblu device broker gateway')
 # pylint: disable=C0103
 group = PARSER.add_mutually_exclusive_group(required=True)
-group.add_argument('--sensors',
+group.add_argument('--iotlab-sensors',
                    type=(lambda x: ('sensors_on %d' % _check_period(x))),
                    metavar=PERIOD_METAVAR,
-                   help='sensors measure period in seconds',
-                   dest='sensors')
+                   help='iotlab sensors (temperature, pressure, light) measure period in seconds',
+                   dest='iotlab_sensors')
 group.add_argument('--parking',
                    type=(lambda x: ('parking_on %d' % _check_period(x))),
                    metavar=PERIOD_METAVAR,
@@ -243,9 +243,9 @@ def main():
                              exp_nodes,
                              FW_DICT['serial_sensors'])
         return
-    if (opts.sensors):
-        cmd = opts.sensors
-        node_type = 'sensor'
+    if (opts.iotlab_sensors):
+        cmd = opts.iotlab_sensors
+        node_type = 'iotlab_sensors'
     if (opts.parking):
         cmd = opts.parking
         node_type = 'parking'

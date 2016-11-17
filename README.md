@@ -97,8 +97,8 @@ Finally you should launch the serial_sensors.py script as follows :
 
 ```
 <login>@<site>:~/embers/iot-lab$ ./serial_sensors.py -h
-# read sensors with a period of 10 seconds
-<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --sensors 10
+# read iotlab sensors with a period of 10 seconds
+<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --iotlab-sensors 10
 # parking event with a period of 30 seconds (eg. average of 1 event every 30 seconds or 120 events per hour) 
 <login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --parking 30
 # traffic events read from dataset every 5 seconds

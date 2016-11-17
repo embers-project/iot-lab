@@ -56,8 +56,7 @@ def handle_measure(identifier, line):
             now = datetime.datetime.now()
             # TODO
             # add ControlNode timestamp instead of frontend SSH
-            timestamp = time.mktime(now.timetuple())
-            data['timestamp'] = timestamp
+            data['timestamp'] = now.strftime("%Y-%m-%dT%H:%M:%S")
         except ValueError:
             # we ignore lines not in JSON format
             #print(line)

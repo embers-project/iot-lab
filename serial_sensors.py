@@ -112,7 +112,7 @@ def _get_exp_nodes(iotlab_api, exp_id):
 CURRENT_DIR = os.path.relpath(os.path.dirname(__file__))
 FW_DIR = os.path.join(CURRENT_DIR, 'firmwares/')
 FW_DICT = {
-    'serial_sensors': os.path.join(FW_DIR, 'serial_sensors.elf'),
+    'serial_sensors': os.path.join(FW_DIR, 'embers_sensors.elf'),
 }
 
 def _update_fw_exp_nodes(iotlab_api, exp_id, exp_nodes, firmware_path):

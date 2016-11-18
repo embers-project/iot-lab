@@ -73,6 +73,7 @@ sensors_off          Stop sensors measure
 parking_on           [average delay:seconds] Start parking simulator. Default 30s, min 1s
 parking_off          Stop parking simulator
 traffic              [vehicle count]  Send traffic event
+pollution            [o2,particles,co,so2,no2]  Send pollution event
 random_on            Add a random delay before starting measures, default ON
 random_off           No random delay before starting measures.
 --------------------------------

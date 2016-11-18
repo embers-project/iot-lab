@@ -103,6 +103,8 @@ Finally you should launch the serial_sensors.py script as follows :
 <login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --parking 30
 # traffic events read from dataset every 5 seconds
 <login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --traffic
+# pollution events read from dataset every 5 minutes
+<login>@<site>:~/embers/iot-lab$ ./serial_sensors.py --pollution
 ``` 
 
 > If you have many experiments launch at the same time you must specify the experiment id with -i &lt;exp_id&gt; option.

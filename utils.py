@@ -107,7 +107,7 @@ def get_traffic_payload(reader):
     return payload
 
 def get_attr_nodes(opts, node_type, exp_nodes):
-    if opts.traffic:
+    if opts.traffic or opts.pollution:
         metadata = get_traffic_metadata(exp_nodes)
     else:
         metadata = get_parking_coordinates(exp_nodes)
@@ -124,3 +124,20 @@ def get_attr_nodes(opts, node_type, exp_nodes):
 
     return attr_nodes
 
+def get_pollution_data_readers(attr_nodes):
+    data_readers = {}
+    datafile_path = 'datasets/citypulse/pollution/pollutionData%s.csv'
+    for node, attr in attr_nodes.iteritems():
+        csvfile = open(datafile_path % attr['REPORT_ID'])
+        data_readers[node] = csv.DictReader(csvfile)
+    return data_readers
+
+def get_pollution_payload(reader):
+    fields = [
+        "ozone", "particullate_matter", "carbon_monoxide",
+        "sulfure_dioxide", "nitrogen_dioxide",
+        # longitude,latitude,timestamp
+    ]
+    data = reader.next()
+    payload = "pollution %s" % ",".join([data[f] for f in fields])
+    return payload

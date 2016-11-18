@@ -91,6 +91,10 @@ group.add_argument('--traffic',
                    action='store_true',
                    help='traffic event measure',
                    dest='traffic')
+group.add_argument('--pollution',
+                   action='store_true',
+                   help='pollution event measure',
+                   dest='pollution')
 group.add_argument('--flash',
                    action='store_true',
                    help='flash firmware')
@@ -209,22 +213,34 @@ def spawn_workers(broker_api, broker_devices):
     return workers
 
 def _handle_traffic_data(broker_api, broker_devices, attr_nodes):
-    readers = utils.get_traffic_data_readers(attr_nodes)
+    _handle_file_data(broker_api, broker_devices, attr_nodes,
+                      utils.get_traffic_data_readers,
+                      utils.get_traffic_payload)
+
+def _handle_pollution_data(broker_api, broker_devices, attr_nodes):
+    _handle_file_data(broker_api, broker_devices, attr_nodes,
+                      utils.get_pollution_data_readers,
+                      utils.get_pollution_payload)
+
+def _handle_file_data(broker_api, broker_devices, attr_nodes,
+                      get_readers_func, get_payload_func):
+    readers = get_readers_func(attr_nodes)
     workers = spawn_workers(broker_api, broker_devices)
     try:
-        _do_handle_traffic(broker_devices.keys(), readers,
-                           data_handler.handle_measure)
+        _do_handle_data(broker_devices.keys(), readers,
+                           data_handler.handle_measure,
+                           get_payload_func)
     except KeyboardInterrupt:
         print("interrupted by user, stopping...")
     for worker in workers:
         worker.stop()
 
-def _do_handle_traffic(nodes, readers, line_handler):
+def _do_handle_data(nodes, readers, line_handler, get_payload_func):
     with SerialAggregator(nodes, line_handler=line_handler) as aggregator:
         while True:
             time.sleep(5)
             for node in nodes:
-                payload = utils.get_traffic_payload(readers[node])
+                payload = get_payload_func(readers[node])
                 aggregator.send_nodes([node], payload + "\n")
 
 
@@ -252,6 +268,10 @@ def main():
     if (opts.traffic):
         cmd = None
         node_type = 'traffic'
+    if (opts.pollution):
+        cmd = None
+        node_type = 'pollution'
+
     # reset nodes to be sure of init firmware execution
     _reset_exp_nodes(iotlab_api, exp_id, exp_nodes)
     broker_api = _get_broker_api(opts)
@@ -261,6 +281,8 @@ def main():
     signal.signal(signal.SIGHUP, _sighup_handler)
     if opts.traffic:
         _handle_traffic_data(broker_api, broker_devices, attr_nodes)
+    elif opts.pollution:
+        _handle_pollution_data(broker_api, broker_devices, attr_nodes)
     else:
         _aggregate_measure(broker_api, cmd, broker_devices)
     signal.signal(signal.SIGHUP, signal.SIG_DFL)

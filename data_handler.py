@@ -72,3 +72,4 @@ def handle_measure(identifier, line):
             return
 
         _queue.put({identifier : data})
+        #print( "%f %s queue size %d" % (timestamp, identifier, _queue.qsize() ))

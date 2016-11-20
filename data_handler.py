@@ -36,7 +36,7 @@ class MeasureHandler(threading.Thread):
                     res = self.broker_api.send_message(payload,
                                                        props['uuid'],
                                                        props['token'])
-                    print(time.strftime("%F %T"), device, res)
+                    print(time.strftime("%F %T"), device, json.dumps(res))
                 else:
                     print("Unknown %s device send message" % device)
             except Queue.Empty:

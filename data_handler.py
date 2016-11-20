@@ -2,7 +2,6 @@ from __future__ import print_function
 import threading
 import Queue
 import json
-import datetime
 import time
 
 # pylint: disable=import-error,no-name-in-module
@@ -61,10 +60,9 @@ def handle_measure(identifier, line):
         """
         try:
             data = json.loads(line)
-            now = datetime.datetime.utcnow()
             # TODO
-            # add ControlNode timestamp instead of frontend SSH
-            data['gateway_timestamp'] = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+            # use ControlNode timestamp instead of host time
+            data['gateway_timestamp'] = time.strftime("%FT%T%Z")
         except ValueError:
             # we ignore lines not in JSON format
             #print(line)

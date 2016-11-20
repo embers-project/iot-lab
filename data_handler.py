@@ -61,10 +61,10 @@ def handle_measure(identifier, line):
         """
         try:
             data = json.loads(line)
-            now = datetime.datetime.now()
+            now = datetime.datetime.utcnow()
             # TODO
             # add ControlNode timestamp instead of frontend SSH
-            data['gateway_timestamp'] = now.isoformat().split('.')[0] + "Z"
+            data['gateway_timestamp'] = now.strftime("%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             # we ignore lines not in JSON format
             #print(line)

@@ -27,15 +27,8 @@ import sys
 import requests
 import utils
 import csv
-# pylint: disable=import-error,no-name-in-module
-# pylint: disable=wrong-import-order
-try:  # pragma: no cover
-    from urllib.parse import urljoin
-    from urllib.error import HTTPError
-except ImportError:  # pragma: no cover
-    # pylint: disable=import-error,no-name-in-module
-    from urlparse import urljoin
-    from urllib2 import HTTPError
+
+import HTTPError
 
 
 # pylint: disable=maybe-no-member,no-member
@@ -205,7 +198,7 @@ class MeshbluApi(object):
         :param raw: Should data be loaded as json or not
         """
         assert method in ('get', 'post', 'delete', 'put')
-        _url = urljoin(self.broker_url, url)
+        _url = self.broker_url + "/" + url
 
         req = requests.request(
             method,

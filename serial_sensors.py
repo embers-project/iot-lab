@@ -238,7 +238,7 @@ def _handle_file_data(broker_api, broker_devices, attr_nodes,
 def _do_handle_data(nodes, readers, line_handler, get_payload_func):
     with SerialAggregator(nodes, line_handler=line_handler) as aggregator:
         while True:
-            time.sleep(5)
+            time.sleep(60)
             for node in nodes:
                 payload = get_payload_func(readers[node])
                 aggregator.send_nodes([node], payload + "\n")

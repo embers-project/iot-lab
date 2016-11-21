@@ -202,6 +202,7 @@ def spawn_workers(broker_api, broker_devices):
     workers = []
     for device in broker_devices:
         w = data_handler.MeasureHandler(broker_api, broker_devices)
+        w.gateway_uuid = GATEWAY_UUID
         w.start()
         workers.append(w)
     return workers
@@ -238,6 +239,13 @@ def _do_handle_data(nodes, readers, line_handler, get_payload_func):
                 aggregator.send_nodes([node], payload + "\n")
 
 
+GATEWAY_UUID = None
+
+def set_gateway_uuid(node_type):
+    global GATEWAY_UUID
+    conf = utils.get_broker_config('meshblu')
+    GATEWAY_UUID = conf[node_type + "_uuid"]
+
 def main():
     """
     Main serial sensors script.
@@ -265,6 +273,8 @@ def main():
     if (opts.pollution):
         cmd = None
         node_type = 'pollution'
+
+    set_gateway_uuid(node_type)
 
     # reset nodes to be sure of init firmware execution
     _reset_exp_nodes(iotlab_api, exp_id, exp_nodes)

@@ -5,7 +5,8 @@ usage() {
 }
 
 DURATION=120
-NB_SENSORS=50
+#NB_SENSORS=50
+NB_SENSORS=2
 
 
 main() {
@@ -46,7 +47,8 @@ deploy() {
 }
 
 run() {
-	exp_ids=`get_running_experiments`
+	#exp_ids=`get_running_experiments`
+	exp_ids=`get_running_experiments | sed 1d`
 	i=0
 	for id in $exp_ids; do
 		i=$[i+1] ; eval "e$i=$id";

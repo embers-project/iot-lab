@@ -26,7 +26,9 @@ class MeasureHandler(threading.Thread):
                 device, payload = data.popitem()
                 if device in self.broker_devices:
                     props = self.broker_devices[device]
-                    res = self.broker_api.send_message(payload,
+                    message = {"devices": self.gateway_uuid,
+                               "payload": payload}
+                    res = self.broker_api.send_message(message,
                                                        props['uuid'],
                                                        props['token'])
                     print(time.strftime("%F %T"), device, json.dumps(res))

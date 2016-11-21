@@ -157,17 +157,15 @@ class MeshbluApi(object):
                            headers=headers)
         
     
-    def send_message(self, payload, auth_uuid, auth_token):
+    def send_message(self, message, auth_uuid, auth_token):
         """Send a message to devices
 
         :param devices: gateway devices ("uuid", "*", ["uuid1", "uuid2"])
-        :param payload:  key/value pair dictionnary
+        :param message:  key/value pair dictionnary
         :param auth_uuid: uuid authentication credential
         :param auth_token: secret token authentication credential
         """
         headers = self.get_headers(auth_uuid, auth_token)
-        message = {"devices": self.gateway_uuid,
-                   "payload": payload}
         return self.method('messages', 'post',
                            json=message,
                            headers=headers)

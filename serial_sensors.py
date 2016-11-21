@@ -92,6 +92,10 @@ group.add_argument('--pollution',
 group.add_argument('--flash',
                    action='store_true',
                    help='flash firmware')
+group.add_argument('--unregister',
+                   action='store_true',
+                   help='unregister devices')
+
 
 def _get_exp_id(iotlab_api, exp_id):
     """ Get experiment id """
@@ -135,15 +139,21 @@ def _register_broker_devices(broker_api, attr_nodes):
     """
     broker_devices = {}
     for node, attr in attr_nodes.iteritems():
-        try:
-            res = broker_api.register_device(attr)
-            broker_devices[node] = res
-            print('Register %s device : uuid=%s token=%s' % (node, res['uuid'], res['token']))
-        except HTTPError, err:
-            print('Register %s device error : %s' % (node, err))
-        except ConnectionError:
-            print('connection error, aborting.  Devices NOT un-registered')
-            sys.exit(2)
+        registry_device = utils.get_registry_device(node)
+        if not registry_device:
+            try:
+                res = broker_api.register_device(attr)
+                print('Register %s device : uuid=%s token=%s' % (node, res['uuid'], res['token']))
+                utils.store_registry_device(node, res['uuid'], res['token'])
+                broker_devices[node] = res
+            except HTTPError, err:
+                print('Register %s device error : %s' % (node, err))
+            #except ConnectionError:
+            #    print('connection error, aborting.  Devices NOT un-registered')
+            #    sys.exit(2)
+        else:
+            print('Device %s is already registered' % node)
+            broker_devices[node] = registry_device
     return broker_devices
 
 
@@ -157,6 +167,7 @@ def _unregister_broker_devices(broker_api, broker_devices):
                                                props['uuid'],
                                                props['token'])
             print('Unregister %s device : uuid=%s' % (device, res['uuid']))
+            utils.remove_registry_device(device)
         except HTTPError, err:
             print('Unregister %s device error : %s' % (device, err))
 
@@ -178,16 +189,6 @@ def _aggregate_measure(broker_api, cmd, broker_devices):
     print('Stop handler measure')
     for worker in workers:
         worker.stop()
-
-# pylint: disable=unused-argument
-def _sighup_handler(signum, frame):
-    """ catch SIGHUP signal when you kill run script
-    or the experiment is stopped by the scheduler.
-    It raises a keyboard exception (e.g. Ctrl-C) for
-    stopping serial aggregator and unregister devices.
-    """
-    print('SIGHUP signal handler')
-    raise KeyboardInterrupt
 
 
 def _get_broker_api(opts):
@@ -261,9 +262,9 @@ def main():
                              exp_nodes,
                              FW_DICT['serial_sensors'])
         return
+    node_type = 'iotlab_sensors'
     if (opts.iotlab_sensors):
         cmd = opts.iotlab_sensors
-        node_type = 'iotlab_sensors'
     if (opts.parking):
         cmd = opts.parking
         node_type = 'parking'
@@ -281,17 +282,15 @@ def main():
     broker_api = _get_broker_api(opts)
     attr_nodes = utils.get_attr_nodes(opts, node_type, exp_nodes)
     broker_devices = _register_broker_devices(broker_api, attr_nodes)
-
-    signal.signal(signal.SIGHUP, _sighup_handler)
+    if (opts.unregister):
+        _unregister_broker_devices(broker_api, broker_devices)
+        return
     if opts.traffic:
         _handle_traffic_data(broker_api, broker_devices, attr_nodes)
     elif opts.pollution:
         _handle_pollution_data(broker_api, broker_devices, attr_nodes)
     else:
         _aggregate_measure(broker_api, cmd, broker_devices)
-    signal.signal(signal.SIGHUP, signal.SIG_DFL)
-
-    _unregister_broker_devices(broker_api, broker_devices)
 
 
 if __name__ == '__main__':

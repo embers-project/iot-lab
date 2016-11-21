@@ -49,6 +49,43 @@ def get_broker_config(broker_name):
         print err
         sys.exit(1)
 
+REGISTRY_FILE = 'registry-devices.csv'
+
+def get_registry_device(node):
+    try:
+        with open(REGISTRY_FILE, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['device'] == node:
+                    return {'uuid': row['uuid'], 'token': row['token']}
+    except IOError:
+        pass
+    return None
+
+def store_registry_device(node, uuid, token):
+    with open(REGISTRY_FILE, 'a') as csvfile:
+        fieldnames = ['device', 'uuid', 'token']
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        if csvfile.tell() == 0:
+            writer.writeheader()
+        writer.writerow({'device': node, 'uuid': uuid, 'token': token})
+
+
+def remove_registry_device(node):
+    from cStringIO import StringIO
+    tmp_devices = StringIO()
+
+    with open(REGISTRY_FILE, 'r') as csvfile:
+        reader = csv.reader(csvfile)
+        writer = csv.writer(tmp_devices)
+        for row in reader:
+            if row[0] != node:
+               writer.writerow(row)
+
+    with open(REGISTRY_FILE, 'w') as csvfile:
+        csvfile.write(tmp_devices.getvalue())
+
+
 NODE_ATTR = ['network_address', 'uid', 'site', 'archi']
 
 def get_iotlab_attrs(exp_nodes):

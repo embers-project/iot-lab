@@ -38,8 +38,8 @@ class MeasureHandler(threading.Thread):
                 pass
             except HTTPError, err:
                 print('Send message %s device error : %s' % (device, err))
-            except ConnectionError:
-                print('Send message connection error (device: %s)' % device)
+            #except ConnectionError:
+            #    print('Send message connection error (device: %s)' % device)
 
     def stop(self):
         """ Stop measure.

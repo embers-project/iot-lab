@@ -55,7 +55,7 @@ def handle_measure(identifier, line):
             data = json.loads(line)
             # TODO
             # use ControlNode timestamp instead of host time
-            data['gateway_timestamp'] = time.strftime("%FT%T%Z")
+            data['gateway_timestamp'] = time.strftime("%FT%T%z")
         except ValueError:
             # we ignore lines not in JSON format
             #print(line)

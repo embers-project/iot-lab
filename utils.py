@@ -49,7 +49,7 @@ def get_broker_config(broker_name):
         print err
         sys.exit(1)
 
-REGISTRY_FILE = 'registry-devices.csv'
+REGISTRY_FILE = 'meshblu_registry.csv'
 
 def get_registry_device(node):
     try:

@@ -148,9 +148,9 @@ def _register_broker_devices(broker_api, attr_nodes):
                 broker_devices[node] = res
             except HTTPError, err:
                 print('Register %s device error : %s' % (node, err))
-            #except ConnectionError:
-            #    print('connection error, aborting.  Devices NOT un-registered')
-            #    sys.exit(2)
+            except ConnectionError:
+                print('connection error, aborting.  Devices NOT un-registered')
+                sys.exit(2)
         else:
             print('Device %s is already registered' % node)
             broker_devices[node] = registry_device

@@ -5,3 +5,5 @@ try:  # pragma: no cover
 except ImportError:  # pragma: no cover
     # pylint: disable=import-error,no-name-in-module
     from urllib2 import HTTPError
+
+from requests import ConnectionError

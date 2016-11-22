@@ -157,11 +157,15 @@ def _register_broker_devices(broker_api, attr_nodes):
     return broker_devices
 
 
-def _unregister_broker_devices(broker_api, broker_devices):
+def _unregister_broker_devices(broker_api, exp_nodes):
     """
     Unregister experiment nodes with broker device.
     """
-    for device, props in broker_devices.iteritems():
+    for device in exp_nodes.keys():
+        props = utils.get_registry_device(device)
+        if not props:
+            print('Unregister %s device : device is not registed' % device)
+            continue
         try:
             res = broker_api.unregister_device(props['uuid'],
                                                props['uuid'],
@@ -256,12 +260,18 @@ def main():
     iotlab_api = iotlabcli.Api(user, passwd)
     exp_id = _get_exp_id(iotlab_api, opts.exp_id)
     exp_nodes = _get_exp_nodes(iotlab_api, exp_id)
+    broker_api = _get_broker_api(opts)
+
     if (opts.flash):
         _update_fw_exp_nodes(iotlab_api,
                              exp_id,
                              exp_nodes,
                              FW_DICT['serial_sensors'])
         return
+    if (opts.unregister):
+        _unregister_broker_devices(broker_api, exp_nodes)
+        return
+
     node_type = 'iotlab_sensors'
     if (opts.iotlab_sensors):
         cmd = opts.iotlab_sensors
@@ -279,12 +289,8 @@ def main():
 
     # reset nodes to be sure of init firmware execution
     _reset_exp_nodes(iotlab_api, exp_id, exp_nodes)
-    broker_api = _get_broker_api(opts)
     attr_nodes = utils.get_attr_nodes(opts, node_type, exp_nodes)
     broker_devices = _register_broker_devices(broker_api, attr_nodes)
-    if (opts.unregister):
-        _unregister_broker_devices(broker_api, broker_devices)
-        return
     if opts.traffic:
         _handle_traffic_data(broker_api, broker_devices, attr_nodes)
     elif opts.pollution:

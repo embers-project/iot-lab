@@ -40,11 +40,11 @@ import iotlabcli.parser.common
 from iotlabcli import experiment, get_user_credentials
 from iotlabcli import helpers
 from iotlabaggregator.serial import SerialAggregator
+from http_errors import HTTPError, ConnectionError
 import rest
 import utils
 import data_handler
 
-import http_errors
 
 PERIOD_METAVAR = '[1-3600]'
 

@@ -4,7 +4,8 @@ import Queue
 import json
 import time
 
-import http_errors
+from http_errors import HTTPError, ConnectionError
+
 
 class MeasureHandler(threading.Thread):
     """

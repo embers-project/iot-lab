@@ -44,7 +44,7 @@ import rest
 import utils
 import data_handler
 
-import HTTPError
+import http_errors
 
 PERIOD_METAVAR = '[1-3600]'
 

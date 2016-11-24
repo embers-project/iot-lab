@@ -64,7 +64,7 @@ wait
 start the injectors
 -------------------
 
-./injectors.sj run
+./injectors.sh run
 
 
 see it running

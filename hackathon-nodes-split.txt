@@ -1,0 +1,78 @@
+fambon@grenoble:iot-lab$ experiment-cli wait
+Waiting that experiment 55507 gets in state Running
+"Running"
+
+base for nodes selection: expe 55507
+
+split nodes in 4 x 50
+
+experiment-cli get -r | grep grenoble.iot | awk -F '[-.]' '{print $2}' | sort -n | sed '51,$d' > set1
+experiment-cli get -r | grep grenoble.iot | awk -F '[-.]' '{print $2}' | sort -n | sed '1,50 d; 101,$ d' > set2
+experiment-cli get -r | grep grenoble.iot | awk -F '[-.]' '{print $2}' | sort -n | sed '1,100 d; 151,$ d' > set3
+experiment-cli get -r | grep grenoble.iot | awk -F '[-.]' '{print $2}' | sort -n | sed '1,150 d' > set4
+
+fambon@grenoble:iot-lab$ wc -l set*
+ 50 set1
+ 50 set2
+ 50 set3
+ 50 set4
+200 total
+
+iotlab-friendly node-sets
+
+echo `set1` | tr ' ' +
+
+1+2+3+4+5+6+7+8+10+11+12+13+14+15+16+19+20+21+22+23+24+25+26+27+28+29+30+31+32+33+34+35+36+37+38+39+40+41+42+43+45+46+47+48+49+50+51+52+53+55
+
+56+57+58+59+60+61+62+63+64+65+66+67+68+69+70+71+72+73+74+75+76+77+78+79+80+83+85+86+87+88+89+90+91+92+93+94+95+96+97+98+99+100+101+102+103+104+105+106+107+108
+
+109+110+112+113+114+115+116+117+118+119+120+121+122+123+125+126+127+128+129+130+131+132+133+135+136+137+139+140+141+142+144+145+146+147+148+149+150+151+152+153+154+155+156+157+158+159+160+161+162+163
+
+164+166+167+168+169+170+171+172+173+174+175+176+177+179+180+181+182+184+186+188+189+190+191+192+193+194+195+196+197+198+199+200+201+202+204+206+207+208+209+210+211+212+213+214+215+216+217+218+219+220
+
+
+create the experiments
+----------------------
+
+fambon@grenoble:iot-lab$ experiment-cli submit -d 120 -l grenoble,m3,1+2+3+4+5+6+7+8+10+11+12+13+14+15+16+19+20+21+22+23+24+25+26+27+28+29+30+31+32+33+34+35+36+37+38+39+40+41+42+43+45+46+47+48+49+50+51+52+53+55
+{
+    "id": 55572
+}
+fambon@grenoble:iot-lab$ experiment-cli submit -d 120 -l grenoble,m3,56+57+58+59+60+61+62+63+64+65+66+67+68+69+70+71+72+73+74+75+76+77+78+79+80+83+85+86+87+88+89+90+91+92+93+94+95+96+97+98+99+100+101+102+103+104+105+106+107+108
+{
+    "id": 55573
+}
+fambon@grenoble:iot-lab$ experiment-cli submit -d 120 -l grenoble,m3,109+110+112+113+114+115+116+117+118+119+120+121+122+123+125+126+127+128+129+130+131+132+133+135+136+137+139+140+141+142+144+145+146+147+148+149+150+151+152+153+154+155+156+157+158+159+160+161+162+163
+{
+    "id": 55574
+}
+fambon@grenoble:iot-lab$ experiment-cli submit -d 120 -l grenoble,m3,164+166+167+168+169+170+171+172+173+174+175+176+177+179+180+181+182+184+186+188+189+190+191+192+193+194+195+196+197+198+199+200+201+202+204+206+207+208+209+210+211+212+213+214+215+216+217+218+219+220
+{
+    "id": 55575
+}
+
+
+flash the nodes
+---------------
+
+./serial_sensors.py --flash -i 55573 &
+./serial_sensors.py --flash -i 55574 &
+./serial_sensors.py --flash -i 55575 &
+wait
+
+
+start the injectors
+-------------------
+
+./injectors.sj run
+
+
+see it running
+--------------
+
+fambon@grenoble:iot-lab$ ps x | grep -v grep | grep serial_sensors
+24341 pts/2    Sl     0:17 python ./serial_sensors.py -i 55573 --parking 300
+24342 pts/2    Sl     0:19 python ./serial_sensors.py -i 55574 --traffic
+24343 pts/2    Sl     0:16 python ./serial_sensors.py -i 55575 --pollution
+
+

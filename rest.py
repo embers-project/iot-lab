@@ -28,7 +28,7 @@ import requests
 import utils
 import csv
 
-import HTTPError
+from http_errors import HTTPError, ConnectionError
 
 
 # pylint: disable=maybe-no-member,no-member

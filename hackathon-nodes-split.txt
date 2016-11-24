@@ -76,3 +76,11 @@ fambon@grenoble:iot-lab$ ps x | grep -v grep | grep serial_sensors
 24343 pts/2    Sl     0:16 python ./serial_sensors.py -i 55575 --pollution
 
 
+hackathon nodes pre-reservation
+-------------------------------
+
+embers@grenoble:~/embers/iot-lab$ experiment-cli submit -d $[60*24*2] -r `date -d "Fri 17:00+02:00" +%s` -l grenoble,m3,$(echo `cat set[1-4]` | tr ' ' +)
+{
+    "id": 55682
+}
+

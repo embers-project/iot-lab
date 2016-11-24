@@ -64,6 +64,9 @@ fambon@grenoble:iot-lab$ ps x | grep -v grep | grep serial_sensors
 24343 pts/2    Sl     0:16 python ./serial_sensors.py -i 55575 --pollution
 
 
+NOTE: we used sets 2-4 for nodes registration... set1 is spare
+
+
 hackathon nodes pre-reservation
 -------------------------------
 

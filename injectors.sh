@@ -5,8 +5,6 @@ usage() {
 }
 
 DURATION=120
-#NB_SENSORS=50
-NB_SENSORS=2
 
 
 main() {
@@ -37,9 +35,9 @@ setup() {
 }
 
 deploy() {
-	e1=`submit_experiment`
-	e2=`submit_experiment`
-	e3=`submit_experiment`
+	e1=`submit_experiment set2`
+	e2=`submit_experiment set3`
+	e3=`submit_experiment set4`
 	for id in $e1 $e2 $e3 ; do
 		experiment-cli wait -i $id
 		./serial_sensors.py -i $id --flash
@@ -73,9 +71,10 @@ stop() {
 }
 
 submit_experiment() {
+	nodes_set=$1
 	experiment-cli submit \
 			-d $DURATION \
-			-l $NB_SENSORS,archi=m3:at86rf231+site=$HOSTNAME \
+			-l $HOSTNAME,m3,`echo $(<$nodes_set) | tr ' ' +` \
 	| awk '/id/ {print $2}'
 }
 

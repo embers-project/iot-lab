@@ -45,7 +45,6 @@ deploy() {
 }
 
 run() {
-	#exp_ids=`get_running_experiments`
 	exp_ids=`get_running_experiments`
 	i=0
 	for id in $exp_ids; do

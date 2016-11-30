@@ -31,6 +31,10 @@ setup() {
 	echo "[meshblu]"
 	echo "broker_url = http://msg.embers.city"
 	echo "gateway_uuid = 0d4815f-b0e8-450c-b308-db090ddc68fb"
+	echo
+	echo "parking_uuid   = 08769d4a-7bd9-4a2d-9b2a-b5e0ae292551"
+	echo "traffic_uuid   = 5391cdbf-8920-4980-bf80-3e920e080b65"
+	echo "pollution_uuid = 327f8603-5547-46f1-ab71-2804fdb61b6b"
 	) > broker.cfg
 }
 
